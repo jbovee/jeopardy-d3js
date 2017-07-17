@@ -2,11 +2,11 @@ from flask import Flask, render_template, jsonify, request
 from get_seasons import get_all_seasons, get_season, get_season_range
 import os, re
 
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__, template_folder='')
 
 @app.route("/")
 def index():
-	return render_template("j-viz.html")
+	return render_template("index.html")
 
 @app.route("/season")
 def season_data():
