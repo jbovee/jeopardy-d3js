@@ -41,22 +41,18 @@ function ddLocations() {
 			.attr("height", cols * cellHeight)
 			.style("background", "blue");
 
-		var tooltip = d3.tip()
-			.attr("class", "d3-tip")
-			.offset([(cellHeight / 2) + 12, 0])
-			.html(function(d) { return d; });
-
-		grid.call(tooltip);
-
-		var rects = grid.selectAll("g")
+		var rects = grid.selectAll("g.col")
 			.data(locationTotals)
 			.enter().append("g")
+			.attr("class", "col")
 			.attr("transform", function(d, i) {
 				return "translate(" + i * cellWidth + ")";
-			});
+			})
 
-		rects.selectAll("rect")
-			.data(function(d) {return d;})
+		var cell = rects.selectAll("g.cell")
+			.data(locationTotals);
+
+		cell.data(function(d) {return d;})
 			.enter().append("rect")
 			.attr("fill", function(d) {
 				return colors(d);
@@ -66,38 +62,44 @@ function ddLocations() {
 				return i * cellHeight;
 			})
 			.attr("height", cellHeight)
-			.attr("width", cellWidth)
-			.on("mouseover", function(d) {
-				d3.select(".d3-tip").transition().style("opacity", "1");
-				tooltip.show(d);
+			.attr("width", cellWidth);
+
+		var g = cell.enter().append("g")
+			.attr("opacity", "0")
+			.on("mouseover", function() {
+				d3.select(this).transition()
+					.duration("500")
+					.attr("opacity", "1");
 			})
-			.on("mouseout", function(d) {
-				d3.select(".d3-tip").transition().duration(tooltipTransition).style("opacity", "0").on("end", tooltip.hide);
+			.on("mouseout", function() {
+				d3.select(this).transition()
+					.duration("500")
+					.attr("opacity", "0");
 			});
 
-		d3.select(".d3-tip")
-			.on("mouseover", function(d) {
-				d3.select(".d3-tip").transition().style("opacity", "1");
-			})
-			.on("mousout", function(d) {
-				d3.select(".d3-tip").transition().duration(tooltipTransition).style("opacity", "0").on("end", tooltip.hide);
-			})
-		/* Keeping in case of needing 2d array iteration stuff
-		rects.selectAll("text")
-			.data(function(d) {return d;})
-			.enter().append("text")
-			.attr("x", function(d, i) {
-				return (cellWidth / 2);
-			})
+		g.data(function(d) {return d;})
+			.append("rect")
+			.attr("fill", "#000")
+			.attr("fill-opacity", "0.4")
+			.attr("x", 0)
 			.attr("y", function(d, i) {
-				return (i * cellHeight) + (cellHeight / 2) + 6;
+				return i * cellHeight;
 			})
-			.text(function(d) { return d;})
+			.attr("height", cellHeight)
+			.attr("width", cellWidth);
+
+		g.data(function(d) {return d;})
+			.append("text")
+			.attr("x", (cellWidth / 2))
+			.attr("y", function(d, i) {
+				return i * cellHeight + (cellHeight / 2);
+			})
 			.attr("font-family", "sans-serif")
-			.attr("font-size", "20px")
+			.attr("font-size", "24")
+			.attr("fill", "#fff")
 			.attr("text-anchor", "middle")
-			.attr("font-weight", "bold");
-		*/
+			.attr("alignment-baseline", "central")
+			.text(function(d) {return d;});
 	})
 }
 
