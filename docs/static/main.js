@@ -20,10 +20,14 @@ function ddLocations() {
 		cellWidth = 100,
 		tooltipTransition = 1000;
 
-	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + 4 + ".csv", function(data) {
+	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + 2 + ".csv", function(data) {
 		data.forEach(function(d) {
+			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+			d.newCoord = [0, 0];
+			d.newCoord[0] = +d.coord[1];
+			d.newCoord[1] = +d.coord[4];
 			if (d.daily_double) {
-				locationTotals[d.coord[1]-1][d.coord[2]-1] += 1;
+				locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
 			}
 		});
 
