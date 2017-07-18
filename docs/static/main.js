@@ -24,7 +24,7 @@ function ddLocations() {
 		data.forEach(function(d) {
 			if (d.daily_double) {
 				console.log(d.coord);
-				locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+				locationTotals[d.coord[1]-1][d.coord[2]-1] += 1;
 			}
 		});
 
