@@ -23,6 +23,7 @@ function ddLocations() {
 	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + 4 + ".csv", function(data) {
 		data.forEach(function(d) {
 			if (d.daily_double) {
+				console.log(d.coord);
 				locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
 			}
 		});
