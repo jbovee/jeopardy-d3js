@@ -20,7 +20,7 @@ function ddLocations() {
 		cellWidth = 100,
 		tooltipTransition = 1000;
 
-	d3.json("/season?no=4", function(data) {
+	d3.csv("/j-archive-csv/j-archive-season-" + 4 + ".csv", function(data) {
 		data.forEach(function(d) {
 			if (d.daily_double) {
 				locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
