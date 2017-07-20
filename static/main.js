@@ -11,7 +11,8 @@ function ddLocations(seasonNo) {
 		cellHeight = 80,
 		cellWidth = 100;
 
-	var seasons = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+	var numSeasons = 33;
+	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
 
 	var locationTotals = [
 		[0, 0, 0, 0, 0],
