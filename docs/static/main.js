@@ -5,7 +5,15 @@ $(function() {
 	//createGraph();
 });
 
-function ddLocations() {
+function ddLocations(seasonNo) {
+	var cols = 5,
+		rows = 6,
+		cellHeight = 80,
+		cellWidth = 100;
+
+	var numSeasons = 33;
+	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
+
 	var locationTotals = [
 		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0],
@@ -14,13 +22,40 @@ function ddLocations() {
 		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0]
 	];
-	var cols = locationTotals[0].length,
-		rows = locationTotals.length,
-		cellHeight = 80,
-		cellWidth = 100,
-		tooltipTransition = 1000;
 
-	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + 2 + ".csv", function(data) {
+	var updateButtons = d3.select("#season-picker")
+		.selectAll(".season-button")
+		.data(seasons);
+
+	updateButtons.enter()
+		.append("input")
+		.attr("value", function(d) {return d;})
+		.attr("type", "button")
+		.attr("class", "update-button")
+		.on("click", function(d) {
+			updateData(d);
+		});
+
+	var grid = d3.select("#grid")
+		.append("svg")
+		.attr("width", rows * cellWidth)
+		.attr("height", cols * cellHeight)
+		.style("background", "#fff");
+
+	var colors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb("#FFFFFF"), d3.rgb("#0000FF")]);
+
+	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
+		locationTotals = [
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0]
+		];
+
 		data.forEach(function(d) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 			d.newCoord = [0, 0];
@@ -35,15 +70,7 @@ function ddLocations() {
 			return r.concat(a);
 		}, []);
 
-		var colors = d3.scaleLinear().domain([1, Math.max.apply(null, arr)])
-			.interpolate(d3.interpolateHcl)
-			.range([d3.rgb("#FFFFFF"), d3.rgb("#0000FF")]);
-
-		var grid = d3.select("#grid")
-			.append("svg")
-			.attr("width", rows * cellWidth)
-			.attr("height", cols * cellHeight)
-			.style("background", "blue");
+		colors.domain([1, Math.max.apply(null, arr) * 10]);
 
 		var rects = grid.selectAll("g.col")
 			.data(locationTotals)
@@ -53,31 +80,36 @@ function ddLocations() {
 				return "translate(" + i * cellWidth + ")";
 			})
 
-		var cell = rects.selectAll("g.cell")
+		var cells = rects.selectAll("g")
 			.data(locationTotals);
 
-		cell.data(function(d) {return d;})
+		var heatCells = cells.data(function(d) {return d;})
 			.enter().append("rect")
-			.attr("fill", function(d) {
-				return colors(d);
-			})
 			.attr("x", 0)
 			.attr("y", function(d, i) {
 				return i * cellHeight;
 			})
 			.attr("height", cellHeight)
-			.attr("width", cellWidth);
+			.attr("width", cellWidth)
+			.attr("class", "heatCell")
+			.attr("z-index", 2)
+			.attr("fill", "#fff");
 
-		var g = cell.enter().append("g")
+		heatCells.transition().duration(1000)
+			.attr("fill", function(d) {
+				return colors(d * 10);
+			});
+
+		var g = cells.enter().append("g")
 			.attr("opacity", "0")
 			.on("mouseover", function() {
 				d3.select(this).transition()
-					.duration("500")
+					.duration("250")
 					.attr("opacity", "1");
 			})
 			.on("mouseout", function() {
 				d3.select(this).transition()
-					.duration("500")
+					.duration("250")
 					.attr("opacity", "0");
 			});
 
@@ -90,9 +122,11 @@ function ddLocations() {
 				return i * cellHeight;
 			})
 			.attr("height", cellHeight)
-			.attr("width", cellWidth);
+			.attr("width", cellWidth)
+			.attr("z-index", 5)
+			.attr("class", ".tipCell");
 
-		g.data(function(d) {return d;})
+		var cellTips = g.data(function(d) {return d;})
 			.append("text")
 			.attr("x", (cellWidth / 2))
 			.attr("y", function(d, i) {
@@ -103,8 +137,56 @@ function ddLocations() {
 			.attr("fill", "#fff")
 			.attr("text-anchor", "middle")
 			.attr("alignment-baseline", "central")
+			.attr("z-index", 10)
+			.attr("class", "tip")
+			.text("");
+
+		cellTips.transition().duration(1000)
 			.text(function(d) {return d;});
-	})
+	});
+
+	function updateData(seasonNo) {
+		d3.json("/season?no=" + seasonNo, function(data) {
+			locationTotals = [
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0],
+				[0, 0, 0, 0, 0]
+			];
+
+			data.forEach(function(d) {
+				if (d.daily_double) {
+					locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+				}
+			});
+
+			arr = locationTotals.reduce(function iter(r, a) {
+				return r.concat(a);
+			}, []);
+
+			colors.domain([1, Math.max.apply(null, arr) * 10]);
+
+			var gCol = d3.select("#grid")
+				.selectAll("g.col")
+				.data(locationTotals);
+
+			gCol.selectAll("rect.heatCell")
+				.data(function(d) {return d;})
+				.transition().duration(1000)
+				.attr("fill", function(d) {
+					return colors(d * 10);
+				});
+
+			gCol.selectAll("text.tip")
+				.data(function(d) {return d;})
+				.transition().duration(1000)
+				.text(function(d) {
+					return d;
+				});
+		})
+	}
 }
 
 /*
