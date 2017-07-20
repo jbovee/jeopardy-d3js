@@ -1,7 +1,7 @@
 // custom javascript
 
 $(function() {
-	ddLocations();
+	ddLocations(1);
 	//createGraph();
 });
 
