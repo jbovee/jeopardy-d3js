@@ -104,15 +104,6 @@ function ddHeatmap(seasonNo) {
 	//	(So I can copy the whole file and just change one part when making changes)		//
 	//////////////////////////////////////////////////////////////////////////////////////
 	/*
-	d3.json("/season?no=" + seasonNo, function(data) {
-
-		//	Go through each question, totalling the number of
-		//	times a daily double occurs on each grid location
-		data.forEach(function(d) {
-			if (d.daily_double) {
-				locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
-			}
-		});
 	*/
 
 	//	Read data from season
@@ -227,9 +218,16 @@ function ddHeatmap(seasonNo) {
 	//////////////////////////////////////////////////////////////////////
 
 	function updateData(seasonNo) {
+		//	Data reading method for github page or just not local webserver					//
+		//	(So I can copy the whole file and just change one part when making changes)		//
+		//////////////////////////////////////////////////////////////////////////////////////
+		/*
+		*/
+
 		//	Read data from season
 		///////////////////////////
-		d3.json("/season?no=" + seasonNo, function(data) {
+		d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
+
 			//	Reset location totals
 			locationTotals = [
 				[0, 0, 0, 0, 0],
@@ -239,12 +237,16 @@ function ddHeatmap(seasonNo) {
 				[0, 0, 0, 0, 0],
 				[0, 0, 0, 0, 0]
 			];
-
 			//	Go through each question, totalling the number of
 			//	times a daily double occurs on each grid location
+
 			data.forEach(function(d) {
+				d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+				d.newCoord = [0, 0];
+				d.newCoord[0] = +d.coord[1];
+				d.newCoord[1] = +d.coord[4];
 				if (d.daily_double) {
-					locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+					locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
 				}
 			});
 
