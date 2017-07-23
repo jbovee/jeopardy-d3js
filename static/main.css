@@ -6,11 +6,19 @@ body {
 	padding-top: 20px;
 }
 
-.d3-tip {
-	line-height: 1;
-	padding: 6px;
-	background: rgba(0, 0, 0, 0.8);
+#seasons-slider {
+	overflow: hidden;
+	width: 600px;
+}
+
+#season-stats p {
+	font-family: sans-serif;
+	font-size: 24px;
 	color: #fff;
-	border-radius: 4px;
-	font-size: 12px;
+}
+
+#seasons-slider-value {
+	font-family: sans-serif;
+	font-size: 24px;
+	color: #fff;
 }
