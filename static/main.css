@@ -6,15 +6,33 @@ body {
 	padding-top: 20px;
 }
 
-#seasons-slider {
-	overflow: hidden;
-	width: 600px;
-}
-
-#season-stats p {
+#dd-stats p.values {
 	font-family: sans-serif;
 	font-size: 24px;
 	color: #fff;
+}
+
+#dd-stats p.title {
+	font-family: sans-serif;
+	font-size: 28px;
+	color: #fff;
+}
+
+#slider path {
+	display: none;
+}
+
+#slider svg line {
+	stroke: #fff;
+}
+
+#slider svg text {
+	fill: #fff;
+}
+
+#seasons-slider {
+	overflow: hidden;
+	width: 600px;
 }
 
 #seasons-slider-value {

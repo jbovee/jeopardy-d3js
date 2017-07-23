@@ -106,7 +106,7 @@ function updateHeatmap(data) {
 		});
 }
 
-function updateStats(data) {
+function updateDdStats(data) {
 	var ddMax = 0,
 		ddMin = Infinity,
 		ddSum = 0,
@@ -126,7 +126,7 @@ function updateStats(data) {
 		}
 	});
 
-	d3.select("#season-stats").select("p").text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
+	d3.select("#dd-stats").select("p.values").text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ function updateData(seasonNo) {
 	///////////////////////////
 	d3.json("/season?no=" + seasonNo, function(data) {
 		updateHeatmap(data);
-		updateStats(data);
+		updateDdStats(data);
 	})
 }
 
@@ -222,14 +222,21 @@ function ddHeatmap(seasonNo) {
 		.attr("max", Math.max.apply(Math, seasons))
 		.attr("list", seasons)
 		.on("change", function() {
-			$("#seasons-slider-value").text("Season " + this.value);
 			updateData(this.value);
 		});
 
-	//	Text that shows slider value
-	updateSlider.append("p")
-		.attr("id", "seasons-slider-value")
-		.text("Season " + Math.min.apply(Math, seasons));
+	var xScale = d3.scalePoint()
+		.domain(seasons)
+		.range([0, cols * cellWidth - 11]);
+
+	var xAxis = d3.axisBottom(xScale);
+
+	updateSlider.append("svg")
+		.attr("width", cols * cellWidth)
+		.attr("height", 30)
+		.append("g")
+		.attr("transform", "translate(5, 4)")
+		.call(xAxis);
 
 	//////////////////////////////////////////////
 	//	Create Buttons for Changing Season Data	//
@@ -535,8 +542,14 @@ function ddHeatmap(seasonNo) {
 }
 
 function ddStats(seasonNo) {
-	var stats = d3.select("#season-stats")
-		.append("p")
+	var stats = d3.select("#dd-stats");
+
+	var title = stats.append("p")
+		.attr("class", "title")
+		.text("Daily Double Stats");
+
+	var values = stats.append("p")
+		.attr("class", "values")
 		.text("");
 
 	//	Data reading method for github.io or just not local webserver					//
@@ -586,7 +599,7 @@ function ddStats(seasonNo) {
 			}
 		});
 
-		stats.text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
+		values.text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
 	});
 }
 
