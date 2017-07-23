@@ -22,10 +22,14 @@ function updateHeatmap(data) {
 	//	Go through each question, totalling the number of
 	//	times a daily double occurs on each grid location
 	data.forEach(function(d) {
+		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+		d.newCoord = [0, 0];
+		d.newCoord[0] = +d.coord[1];
+		d.newCoord[1] = +d.coord[4];
 		if (d.daily_double) {
-			locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
-			colTotals[d.coord[0]-1] += 1;
-			rowTotals[d.coord[1]-1] += 1;
+			locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
+			colTotals[d.newCoord[0]-1] += 1;
+			rowTotals[d.newCoord[1]-1] += 1;
 		}
 	});
 
@@ -114,6 +118,7 @@ function updateDdStats(data) {
 		ddAvg = [];
 
 	data.forEach(function(d) {
+		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 		d.value = d.value[0];
 		if (d.daily_double) {
 			if (d.value > ddMax) {
@@ -277,8 +282,8 @@ function ddHeatmap(seasonNo) {
 			d.newCoord[1] = +d.coord[4];
 			if (d.daily_double) {
 				locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
-				colTotals[d.coord[0]-1] += 1;
-				rowTotals[d.coord[1]-1] += 1;
+				colTotals[d.newCoord[0]-1] += 1;
+				rowTotals[d.newCoord[1]-1] += 1;
 			}
 		});
 
@@ -556,11 +561,17 @@ function ddStats(seasonNo) {
 	////////////////////////////
 	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
 
-		//	Go through each question, totalling the number of
-		//	times a daily double occurs on each grid location
+		var ddMax = 0,
+			ddMin = Infinity,
+			ddSum = 0,
+			ddAvg = [];
+
 		data.forEach(function(d) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+			console.log(d.value);
+			console.log(d.value[0]);
 			d.value = d.value[0];
+			console.log(d.value);
 			if (d.daily_double) {
 				if (d.value > ddMax) {
 					ddMax = d.value;
