@@ -1,8 +1,193 @@
 //	The function that runs when the page loads
 $(function() {
-	ddHeatmap(4);
+	seasonSlider();
+	ddHeatmap(1);
+	ddStats(1);
 	//createGraph();
 });
+
+function updateHeatmap(data) {
+	//	Reset location totals
+	var locationTotals = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		colTotals = [0, 0, 0, 0, 0, 0],
+		rowTotals = [0, 0, 0, 0, 0];
+
+	//	Go through each question, totalling the number of
+	//	times a daily double occurs on each grid location
+	data.forEach(function(d) {
+		if (d.daily_double) {
+			locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+			colTotals[d.coord[0]-1] += 1;
+			rowTotals[d.coord[1]-1] += 1;
+		}
+	});
+
+	//	Again flatten location totals
+	arr = locationTotals.reduce(function iter(r, a) {
+		return r.concat(a);
+	}, []);
+
+	//	Update color range
+	var colors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, arr) * 10]);
+
+	var rowColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, rowTotals) * 10]);
+
+	var colColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, colTotals) * 10]);
+
+	//	Update heat cells and tooltips to new season
+	//////////////////////////////////////////////////
+	var gCol = d3.select("#grid")
+		.selectAll("g.col")
+		.data(locationTotals);
+
+	var gColRows = d3.select("#grid")
+		.select("g.rowTotals");
+
+	var gColCols = d3.select("#grid")
+		.select("g.colTotals");
+
+	//	Change the color of all heat cells
+	gCol.selectAll("rect.heatCell")
+		.data(function(d) {return d;})
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return colors(d * 10);
+		});
+
+	//	Change the text in tooltips
+	gCol.selectAll("text.tip")
+		.data(function(d) {return d;})
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+
+	gColRows.selectAll("rect.heatRow")
+		.data(rowTotals)
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return rowColors(d * 10);
+		});
+
+	gColRows.selectAll("text.rowTip")
+		.data(rowTotals)
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+
+	gColCols.selectAll("rect.heatCol")
+		.data(colTotals)
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return colColors(d * 10);
+		});
+
+	gColCols.selectAll("text.colTip")
+		.data(colTotals)
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+}
+
+function updateDdStats(data) {
+	var ddMax = 0,
+		ddMin = Infinity,
+		ddSum = 0,
+		ddAvg = [];
+
+	data.forEach(function(d) {
+		d.value = d.value[0];
+		if (d.daily_double) {
+			if (d.value > ddMax) {
+				ddMax = d.value;
+			}
+			if (d.value < ddMin) {
+				ddMin = d.value;
+			}
+			ddAvg.push(d.value);
+			ddSum += d.value;
+		}
+	});
+
+	d3.select("#dd-stats").select("p.values").text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
+}
+
+//////////////////////////////////////////////////////////////////////
+//	Function for updating gric colors and tip values given a season	//
+//////////////////////////////////////////////////////////////////////
+
+function updateData(seasonNo) {
+	//	Data reading method for github page or just not local webserver					//
+	//	(So I can copy the whole file and just change one part when making changes)		//
+	//////////////////////////////////////////////////////////////////////////////////////
+	/*
+	//	Read data from season
+	///////////////////////////
+	d3.json("/season?no=" + seasonNo, function(data) {
+	*/
+
+	//	Read data from season
+	///////////////////////////
+	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
+		updateHeatmap(data);
+		updateDdStats(data);
+	})
+}
+
+function seasonSlider() {
+	//////////////////////////////////////////////
+	//	Create Slider for Changing Season Data	//
+	//////////////////////////////////////////////
+	var numSeasons = 33;
+	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
+
+	
+	var slider = d3.select("#slider");
+
+	//	Slider
+	slider.append("input")
+		.attr("name", "seasons-slider")
+		.attr("id", "seasons-slider")
+		.attr("type", "range")
+		.attr("value", Math.min.apply(Math, seasons))
+		.attr("min", Math.min.apply(Math, seasons))
+		.attr("max", Math.max.apply(Math, seasons))
+		.attr("list", seasons)
+		.on("change", function() {
+			updateData(this.value);
+		});
+
+	var xScale = d3.scalePoint()
+		.domain(seasons)
+		.range([0, 600 - 11]);
+
+	var xAxis = d3.axisBottom(xScale);
+
+	slider.append("svg")
+		.attr("width", 600)
+		.attr("height", 30)
+		.append("g")
+		.attr("transform", "translate(5, 4)")
+		.call(xAxis);
+}
 
 //////////////////////////////////////////////////////
 //	Function for creating a daily double heatmap,	//
@@ -15,10 +200,13 @@ function ddHeatmap(seasonNo) {
 	//	Initialize variables	//
 	//////////////////////////////
 
-	var cols = 5,
-		rows = 6,
+	var rows = 5,
+		cols = 6,
 		cellHeight = 80,
 		cellWidth = 100;
+
+	startColor = "#FFFFFF";
+	endColor = "#0000FF";
 
 	var numSeasons = 33;
 	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
@@ -30,59 +218,9 @@ function ddHeatmap(seasonNo) {
 		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0]
-	];
-
-	//////////////////////////////////////////////
-	//	Create Slider for Changing Season Data	//
-	//////////////////////////////////////////////
-	
-	var updateSlider = d3.select("#season-slider");
-
-	//	Slider
-	updateSlider.append("input")
-		.attr("name", "seasons-slider")
-		.attr("id", "seasons-slider")
-		.attr("type", "range")
-		.attr("value", Math.min.apply(Math, seasons))
-		.attr("min", Math.min.apply(Math, seasons))
-		.attr("max", Math.max.apply(Math, seasons))
-		.attr("list", seasons)
-		.on("change", function() {
-			$("#seasons-slider-value").text(this.value);
-			updateData(this.value);
-		});
-
-	//	Text that shows slider value
-	updateSlider.append("svg")
-		.attr("height", 30)
-		.attr("width", 50)
-		.append("text")
-		.attr("id", "seasons-slider-value")
-		.attr("x", 25)
-		.attr("y", 15)
-		.attr("font-family", "sans-serif")
-		.attr("font-size", "18")
-		.attr("fill", "#fff")
-		.attr("text-anchor", "middle")
-		.attr("alignment-baseline", "central")
-		.text(Math.min.apply(Math, seasons));
-
-	//////////////////////////////////////////////
-	//	Create Buttons for Changing Season Data	//
-	//////////////////////////////////////////////
-
-	var updateButtons = d3.select("#season-picker")
-		.selectAll(".season-button")
-		.data(seasons);
-
-	updateButtons.enter()
-		.append("input")
-		.attr("value", function(d) {return d;})
-		.attr("type", "button")
-		.attr("class", "update-button")
-		.on("click", function(d) {
-			updateData(d);
-		});
+	],
+		colTotals = [0, 0, 0, 0, 0, 0],
+		rowTotals = [0, 0, 0, 0, 0];
 
 	//////////////////////////////////////////
 	//	Create Daily Double Heatmap Grid	//
@@ -91,19 +229,39 @@ function ddHeatmap(seasonNo) {
 	//	Main svg element
 	var grid = d3.select("#grid")
 		.append("svg")
-		.attr("width", rows * cellWidth)
-		.attr("height", cols * cellHeight)
-		.style("background", "#fff");
+		.attr("width", (cols + 1) * cellWidth + 10)
+		.attr("height", (rows + 1) * cellHeight + 10);
 
 	//	Color scale from white to blue. Domain assigned later
 	var colors = d3.scaleLinear()
 		.interpolate(d3.interpolateHcl)
-		.range([d3.rgb("#FFFFFF"), d3.rgb("#0000FF")]);
+		.range([d3.rgb(startColor), d3.rgb(endColor)]);
+
+	var rowColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)]);
+
+	var colColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)]);
 
 	//	Data reading method for github.io or just not local webserver					//
 	//	(So I can copy the whole file and just change one part when making changes)		//
 	//////////////////////////////////////////////////////////////////////////////////////
 	/*
+	//	Read data from season
+	////////////////////////////
+	d3.json("/season?no=" + seasonNo, function(data) {
+
+		//	Go through each question, totalling the number of
+		//	times a daily double occurs on each grid location
+		data.forEach(function(d) {
+			if (d.daily_double) {
+				locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+				colTotals[d.coord[0]-1] += 1;
+				rowTotals[d.coord[1]-1] += 1;
+			}
+		});
 	*/
 
 	//	Read data from season
@@ -119,6 +277,8 @@ function ddHeatmap(seasonNo) {
 			d.newCoord[1] = +d.coord[4];
 			if (d.daily_double) {
 				locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
+				colTotals[d.coord[0]-1] += 1;
+				rowTotals[d.coord[1]-1] += 1;
 			}
 		});
 
@@ -164,6 +324,58 @@ function ddHeatmap(seasonNo) {
 				return colors(d * 10);
 			});
 
+		rowColors.domain([1, Math.max.apply(Math, rowTotals) * 10]);
+
+		var heatRows = d3.select("#grid svg")
+			.append("g")
+			.attr("class", "rowTotals")
+			.attr("transform", function() {
+				return "translate(" + (cols * cellWidth + 10) + ")";
+			});
+
+		var heatRowCells = heatRows.selectAll("rect")
+			.data(rowTotals)
+			.enter().append("rect")
+			.attr("x", 0)
+			.attr("y", function(d, i) {
+				return i * cellHeight;
+			})
+			.attr("height", cellHeight)
+			.attr("width", cellWidth)
+			.attr("class", "heatRow")
+			.attr("fill", "#fff");
+
+		heatRowCells.transition().duration(1000)
+			.attr("fill", function(d) {
+				return rowColors(d * 10);
+			});
+
+		colColors.domain([1, Math.max.apply(Math, colTotals) * 10]);
+
+		var heatCols = d3.select("#grid svg")
+			.append("g")
+			.attr("class", "colTotals")
+			.attr("transform", function() {
+				return "translate(0 " + (rows * cellHeight + 10) + ")";
+			});
+
+		var heatColCells = heatCols.selectAll("rect")
+			.data(colTotals)
+			.enter().append("rect")
+			.attr("x", function(d, i) {
+				return i * cellWidth;
+			})
+			.attr("y", 0)
+			.attr("height", cellHeight)
+			.attr("width", cellWidth)
+			.attr("class", "heatCol")
+			.attr("fill", "#fff");
+
+		heatColCells.transition().duration(1000)
+			.attr("fill", function(d) {
+				return colColors(d * 10);
+			});
+
 		//	Tooltip groupings
 		////////////////////////
 		var g = cells.enter().append("g")
@@ -199,11 +411,11 @@ function ddHeatmap(seasonNo) {
 			.attr("y", function(d, i) {
 				return i * cellHeight + (cellHeight / 2);
 			})
-			.attr("font-family", "sans-serif")
-			.attr("font-size", "24")
-			.attr("fill", "#fff")
-			.attr("text-anchor", "middle")
-			.attr("alignment-baseline", "central")
+			.style("font-family", "sans-serif")
+			.style("font-size", "24")
+			.style("fill", "#fff")
+			.style("text-anchor", "middle")
+			.style("alignment-baseline", "central")
 			.attr("class", "tip")
 			.text("");
 
@@ -211,76 +423,158 @@ function ddHeatmap(seasonNo) {
 		//	transitions when loading data for a season
 		cellTips.transition().duration(1000)
 			.text(function(d) {return d;});
-	});
 
-	//////////////////////////////////////////////////////////////////////
-	//	Function for updating gric colors and tip values given a season	//
-	//////////////////////////////////////////////////////////////////////
-
-	function updateData(seasonNo) {
-		//	Data reading method for github page or just not local webserver					//
-		//	(So I can copy the whole file and just change one part when making changes)		//
-		//////////////////////////////////////////////////////////////////////////////////////
-		/*
-		*/
-
-		//	Read data from season
-		///////////////////////////
-		d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
-
-			//	Reset location totals
-			locationTotals = [
-				[0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0],
-				[0, 0, 0, 0, 0]
-			];
-			//	Go through each question, totalling the number of
-			//	times a daily double occurs on each grid location
-
-			data.forEach(function(d) {
-				d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
-				d.newCoord = [0, 0];
-				d.newCoord[0] = +d.coord[1];
-				d.newCoord[1] = +d.coord[4];
-				if (d.daily_double) {
-					locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
-				}
+		var gRow = heatRows.selectAll("g.rowTip")
+			.data(rowTotals)
+			.enter().append("g")
+			.attr("opacity", "0")
+			.on("mouseover", function() {
+				d3.select(this).transition()
+					.duration("250")
+					.attr("opacity", "1");
+			})
+			.on("mouseout", function() {
+				d3.select(this).transition()
+					.duration("250")
+					.attr("opacity", "0");
 			});
 
-			//	Again flatten location totals
-			arr = locationTotals.reduce(function iter(r, a) {
-				return r.concat(a);
-			}, []);
+		gRow.append("rect")
+			.attr("fill", "#000")
+			.attr("fill-opacity", "0.4")
+			.attr("x", 0)
+			.attr("y", function(d, i) {
+				return i * cellHeight;
+			})
+			.attr("height", cellHeight)
+			.attr("width", cellWidth)
+			.attr("class", ".rowTipCell");
 
-			//	Update color range
-			colors.domain([1, Math.max.apply(null, arr) * 10]);
+		var rowTips = gRow.append("text")
+			.attr("x", (cellWidth / 2))
+			.attr("y", function(d, i) {
+				return i * cellHeight + (cellHeight / 2);
+			})
+			.style("font-family", "sans-serif")
+			.style("font-size", "24")
+			.style("fill", "#fff")
+			.style("text-anchor", "middle")
+			.style("alignment-baseline", "central")
+			.attr("class", "rowTip")
+			.text("");
 
-			//	Update heat cells and tooltips to new season
-			//////////////////////////////////////////////////
-			var gCol = d3.select("#grid")
-				.selectAll("g.col")
-				.data(locationTotals);
+		rowTips.transition().duration(1000)
+			.text(function(d) {return d;});
 
-			//	Change the color of all heat cells
-			gCol.selectAll("rect.heatCell")
-				.data(function(d) {return d;})
-				.transition().duration(1000)
-				.attr("fill", function(d) {
-					return colors(d * 10);
-				});
+		var gCol = heatCols.selectAll("g.colTip")
+			.data(colTotals)
+			.enter().append("g")
+			.attr("opacity", "0")
+			.on("mouseover", function() {
+				d3.select(this).transition()
+					.duration("250")
+					.attr("opacity", "1");
+			})
+			.on("mouseout", function() {
+				d3.select(this).transition()
+					.duration("250")
+					.attr("opacity", "0");
+			});
 
-			//	Change the text in tooltips
-			gCol.selectAll("text.tip")
-				.data(function(d) {return d;})
-				.transition().duration(1000)
-				.text(function(d) {
-					return d;
-				});
-		})
-	}
+		gCol.append("rect")
+			.attr("fill", "#000")
+			.attr("fill-opacity", "0.4")
+			.attr("x", function(d, i) {
+				return i * cellWidth;
+			})
+			.attr("y", 0)
+			.attr("height", cellHeight)
+			.attr("width", cellWidth)
+			.attr("class", ".colTipCell");
+
+		var colTips = gCol.append("text")
+			.attr("x", function(d, i) {
+				return i * cellWidth + (cellWidth / 2);
+			})
+			.attr("y", (cellHeight / 2))
+			.style("font-family", "sans-serif")
+			.style("font-size", "24")
+			.style("fill", "#fff")
+			.style("text-anchor", "middle")
+			.style("alignment-baseline", "central")
+			.attr("class", "colTip")
+			.text("");
+
+		colTips.transition().duration(1000)
+			.text(function(d) {return d;});
+	});
+}
+
+function ddStats(seasonNo) {
+	var stats = d3.select("#dd-stats");
+
+	var title = stats.append("p")
+		.attr("class", "title")
+		.text("Daily Double Stats");
+
+	var values = stats.append("p")
+		.attr("class", "values")
+		.text("");
+
+	//	Data reading method for github.io or just not local webserver					//
+	//	(So I can copy the whole file and just change one part when making changes)		//
+	//////////////////////////////////////////////////////////////////////////////////////
+	/*
+	//	Read data from season
+	////////////////////////////
+	d3.json("/season?no=" + seasonNo, function(data) {
+
+		//	Go through each question, totalling the number of
+		//	times a daily double occurs on each grid location
+
+		var ddMax = 0,
+			ddMin = Infinity,
+			ddSum = 0,
+			ddAvg = [];
+
+		data.forEach(function(d) {
+			d.value = d.value[0];
+			if (d.daily_double) {
+				if (d.value > ddMax) {
+					ddMax = d.value;
+				}
+				if (d.value < ddMin) {
+					ddMin = d.value;
+				}
+				ddAvg.push(d.value);
+				ddSum += d.value;
+			}
+		});
+	*/
+
+	//	Read data from season
+	////////////////////////////
+	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
+
+		//	Go through each question, totalling the number of
+		//	times a daily double occurs on each grid location
+		data.forEach(function(d) {
+			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+			d.value = d.value[0];
+			if (d.daily_double) {
+				if (d.value > ddMax) {
+					ddMax = d.value;
+				}
+				if (d.value < ddMin) {
+					ddMin = d.value;
+				}
+				ddAvg.push(d.value);
+				ddSum += d.value;
+			}
+		});
+
+		values.text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
+	});
 }
 
 //////////////////////////////////////////////////////////////////

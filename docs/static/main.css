@@ -6,11 +6,37 @@ body {
 	padding-top: 20px;
 }
 
-.d3-tip {
-	line-height: 1;
-	padding: 6px;
-	background: rgba(0, 0, 0, 0.8);
+#dd-stats p.values {
+	font-family: sans-serif;
+	font-size: 24px;
 	color: #fff;
-	border-radius: 4px;
-	font-size: 12px;
+}
+
+#dd-stats p.title {
+	font-family: sans-serif;
+	font-size: 28px;
+	color: #fff;
+}
+
+#slider path {
+	display: none;
+}
+
+#slider svg line {
+	stroke: #fff;
+}
+
+#slider svg text {
+	fill: #fff;
+}
+
+#seasons-slider {
+	overflow: hidden;
+	width: 600px;
+}
+
+#seasons-slider-value {
+	font-family: sans-serif;
+	font-size: 24px;
+	color: #fff;
 }
