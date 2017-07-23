@@ -1,5 +1,6 @@
 //	The function that runs when the page loads
 $(function() {
+	seasonSlider();
 	ddHeatmap(1);
 	ddStats(1);
 	//createGraph();
@@ -173,6 +174,43 @@ function updateData(seasonNo) {
 	})
 }
 
+function seasonSlider() {
+	//////////////////////////////////////////////
+	//	Create Slider for Changing Season Data	//
+	//////////////////////////////////////////////
+	var numSeasons = 33;
+	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
+
+	
+	var slider = d3.select("#slider");
+
+	//	Slider
+	slider.append("input")
+		.attr("name", "seasons-slider")
+		.attr("id", "seasons-slider")
+		.attr("type", "range")
+		.attr("value", Math.min.apply(Math, seasons))
+		.attr("min", Math.min.apply(Math, seasons))
+		.attr("max", Math.max.apply(Math, seasons))
+		.attr("list", seasons)
+		.on("change", function() {
+			updateData(this.value);
+		});
+
+	var xScale = d3.scalePoint()
+		.domain(seasons)
+		.range([0, 600 - 11]);
+
+	var xAxis = d3.axisBottom(xScale);
+
+	slider.append("svg")
+		.attr("width", 600)
+		.attr("height", 30)
+		.append("g")
+		.attr("transform", "translate(5, 4)")
+		.call(xAxis);
+}
+
 //////////////////////////////////////////////////////
 //	Function for creating a daily double heatmap,	//
 //	plus buttons and a slider for changing season.	//
@@ -206,55 +244,6 @@ function ddHeatmap(seasonNo) {
 		colTotals = [0, 0, 0, 0, 0, 0],
 		rowTotals = [0, 0, 0, 0, 0];
 
-	//////////////////////////////////////////////
-	//	Create Slider for Changing Season Data	//
-	//////////////////////////////////////////////
-	
-	var updateSlider = d3.select("#slider");
-
-	//	Slider
-	updateSlider.append("input")
-		.attr("name", "seasons-slider")
-		.attr("id", "seasons-slider")
-		.attr("type", "range")
-		.attr("value", Math.min.apply(Math, seasons))
-		.attr("min", Math.min.apply(Math, seasons))
-		.attr("max", Math.max.apply(Math, seasons))
-		.attr("list", seasons)
-		.on("change", function() {
-			updateData(this.value);
-		});
-
-	var xScale = d3.scalePoint()
-		.domain(seasons)
-		.range([0, cols * cellWidth - 11]);
-
-	var xAxis = d3.axisBottom(xScale);
-
-	updateSlider.append("svg")
-		.attr("width", cols * cellWidth)
-		.attr("height", 30)
-		.append("g")
-		.attr("transform", "translate(5, 4)")
-		.call(xAxis);
-
-	//////////////////////////////////////////////
-	//	Create Buttons for Changing Season Data	//
-	//////////////////////////////////////////////
-	/*
-	var updateButtons = d3.select("#season-picker")
-		.selectAll(".season-button")
-		.data(seasons);
-
-	updateButtons.enter()
-		.append("input")
-		.attr("value", function(d) {return d;})
-		.attr("type", "button")
-		.attr("class", "update-button")
-		.on("click", function(d) {
-			updateData(d);
-		});
-	*/
 	//////////////////////////////////////////
 	//	Create Daily Double Heatmap Grid	//
 	//////////////////////////////////////////
