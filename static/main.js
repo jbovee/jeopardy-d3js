@@ -39,6 +39,16 @@ function updateHeatmap(data) {
 		.range([d3.rgb(startColor), d3.rgb(endColor)])
 		.domain([1, Math.max.apply(null, arr) * 10]);
 
+	var rowColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, rowTotals) * 10]);
+
+	var colColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, colTotals) * 10]);
+
 	//	Update heat cells and tooltips to new season
 	//////////////////////////////////////////////////
 	var gCol = d3.select("#grid")
@@ -47,6 +57,9 @@ function updateHeatmap(data) {
 
 	var gColRows = d3.select("#grid")
 		.select("g.rowTotals");
+
+	var gColCols = d3.select("#grid")
+		.select("g.colTotals");
 
 	//	Change the color of all heat cells
 	gCol.selectAll("rect.heatCell")
@@ -64,17 +77,29 @@ function updateHeatmap(data) {
 			return d;
 		});
 
-	colors.domain([1, Math.max.apply(null, rowTotals) * 10]);
-
 	gColRows.selectAll("rect.heatRow")
 		.data(rowTotals)
 		.transition().duration(1000)
 		.attr("fill", function(d) {
-			return colors(d * 10);
+			return rowColors(d * 10);
 		});
 
 	gColRows.selectAll("text.rowTip")
 		.data(rowTotals)
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+
+	gColCols.selectAll("rect.heatCol")
+		.data(colTotals)
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return colColors(d * 10);
+		});
+
+	gColCols.selectAll("text.colTip")
+		.data(colTotals)
 		.transition().duration(1000)
 		.text(function(d) {
 			return d;
@@ -238,6 +263,14 @@ function ddHeatmap(seasonNo) {
 		.interpolate(d3.interpolateHcl)
 		.range([d3.rgb(startColor), d3.rgb(endColor)]);
 
+	var rowColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)]);
+
+	var colColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)]);
+
 	//	Data reading method for github.io or just not local webserver					//
 	//	(So I can copy the whole file and just change one part when making changes)		//
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -315,7 +348,7 @@ function ddHeatmap(seasonNo) {
 				return colors(d * 10);
 			});
 
-		colors.domain([1, Math.max.apply(Math, rowTotals) * 10]);
+		rowColors.domain([1, Math.max.apply(Math, rowTotals) * 10]);
 
 		var heatRows = d3.select("#grid svg")
 			.append("g")
@@ -338,7 +371,33 @@ function ddHeatmap(seasonNo) {
 
 		heatRowCells.transition().duration(1000)
 			.attr("fill", function(d) {
-				return colors(d * 10);
+				return rowColors(d * 10);
+			});
+
+		colColors.domain([1, Math.max.apply(Math, colTotals) * 10]);
+
+		var heatCols = d3.select("#grid svg")
+			.append("g")
+			.attr("class", "colTotals")
+			.attr("transform", function() {
+				return "translate(0 " + (rows * cellHeight + 10) + ")";
+			});
+
+		var heatColCells = heatCols.selectAll("rect")
+			.data(colTotals)
+			.enter().append("rect")
+			.attr("x", function(d, i) {
+				return i * cellWidth;
+			})
+			.attr("y", 0)
+			.attr("height", cellHeight)
+			.attr("width", cellWidth)
+			.attr("class", "heatCol")
+			.attr("fill", "#fff");
+
+		heatColCells.transition().duration(1000)
+			.attr("fill", function(d) {
+				return colColors(d * 10);
 			});
 
 		//	Tooltip groupings
@@ -429,6 +488,48 @@ function ddHeatmap(seasonNo) {
 			.text("");
 
 		rowTips.transition().duration(1000)
+			.text(function(d) {return d;});
+
+		var gCol = heatCols.selectAll("g.colTip")
+			.data(colTotals)
+			.enter().append("g")
+			.attr("opacity", "0")
+			.on("mouseover", function() {
+				d3.select(this).transition()
+					.duration("250")
+					.attr("opacity", "1");
+			})
+			.on("mouseout", function() {
+				d3.select(this).transition()
+					.duration("250")
+					.attr("opacity", "0");
+			});
+
+		gCol.append("rect")
+			.attr("fill", "#000")
+			.attr("fill-opacity", "0.4")
+			.attr("x", function(d, i) {
+				return i * cellWidth;
+			})
+			.attr("y", 0)
+			.attr("height", cellHeight)
+			.attr("width", cellWidth)
+			.attr("class", ".colTipCell");
+
+		var colTips = gCol.append("text")
+			.attr("x", function(d, i) {
+				return i * cellWidth + (cellWidth / 2);
+			})
+			.attr("y", (cellHeight / 2))
+			.style("font-family", "sans-serif")
+			.style("font-size", "24")
+			.style("fill", "#fff")
+			.style("text-anchor", "middle")
+			.style("alignment-baseline", "central")
+			.attr("class", "colTip")
+			.text("");
+
+		colTips.transition().duration(1000)
 			.text(function(d) {return d;});
 	});
 }
