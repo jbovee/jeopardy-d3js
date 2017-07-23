@@ -569,7 +569,7 @@ function ddStats(seasonNo) {
 		data.forEach(function(d) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 			if (d.daily_double) {
-				d.value = d.slice(1, d.indexOf(","));
+				d.value = d.value.slice(1, d.value.indexOf(","));
 				if (d.value > ddMax) {
 					ddMax = d.value;
 				}

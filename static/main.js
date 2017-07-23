@@ -529,12 +529,15 @@ function ddStats(seasonNo) {
 	////////////////////////////
 	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
 
-		//	Go through each question, totalling the number of
-		//	times a daily double occurs on each grid location
+		var ddMax = 0,
+			ddMin = Infinity,
+			ddSum = 0,
+			ddAvg = [];
+
 		data.forEach(function(d) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
-			d.value = d.value[0];
 			if (d.daily_double) {
+				d.value = d.value.slice(1, d.value.indexOf(","));
 				if (d.value > ddMax) {
 					ddMax = d.value;
 				}
