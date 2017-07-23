@@ -568,11 +568,8 @@ function ddStats(seasonNo) {
 
 		data.forEach(function(d) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
-			console.log(d.value);
-			console.log(d.value[0]);
-			d.value = d.value[0];
-			console.log(d.value);
 			if (d.daily_double) {
+				d.value = d.slice(1, d.indexOf(","));
 				if (d.value > ddMax) {
 					ddMax = d.value;
 				}
