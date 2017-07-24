@@ -158,7 +158,7 @@ function updateDdStats(data) {
 				}
 				ddAvg.push(v);
 				ddSum += v;
-			}
+			});
 		}
 	});
 
