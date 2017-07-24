@@ -277,7 +277,7 @@ function updateData(seasonNo) {
 
 	//	Read data from season
 	///////////////////////////
-	d3.json("/season?no=" + seasonNo, function(data) {
+	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
 		updateHeatmap(data);
 		updateDdStats(data);
 		updateFjStats(data);
