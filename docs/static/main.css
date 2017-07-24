@@ -6,13 +6,25 @@ body {
 	padding-top: 20px;
 }
 
-#dd-stats p.values {
+#dd-stats svg text {
 	font-family: sans-serif;
 	font-size: 24px;
-	color: #fff;
+	fill: #fff;
 }
 
 #dd-stats p.title {
+	font-family: sans-serif;
+	font-size: 28px;
+	color: #fff;
+}
+
+#fj-stats svg text {
+	font-family: sans-serif;
+	font-size: 24px;
+	fill: #fff;
+}
+
+#fj-stats p.title {
 	font-family: sans-serif;
 	font-size: 28px;
 	color: #fff;
@@ -27,6 +39,18 @@ body {
 }
 
 #slider svg text {
+	fill: #fff;
+}
+
+#dd-order path {
+	display: none;
+}
+
+#dd-order svg line {
+	stroke: #fff;
+}
+
+#dd-order svg text {
 	fill: #fff;
 }
 

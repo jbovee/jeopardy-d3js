@@ -3,6 +3,8 @@ $(function() {
 	seasonSlider();
 	ddHeatmap(1);
 	ddStats(1);
+	fjStats(1);
+	ddOrder(1);
 	//createGraph();
 });
 
@@ -154,7 +156,104 @@ function updateDdStats(data) {
 		}
 	});
 
-	d3.select("#dd-stats").select("p.values").text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
+	var format = d3.format(",d");
+
+	d3.selectAll("#dd-stats text.values")
+		.data([ddMax, ddMin, (ddSum/ddAvg.length).toFixed(2)])
+		.transition()
+		.duration(1000).delay(0)
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text().replace(/,/g, ""), d);
+			return function(t) { that.text(format(i(t))); };
+		});
+}
+
+function updateFjStats(data) {
+	var fjMax = 0,
+		fjMin = Infinity,
+		fjSum = 0,
+		fjAvg = [];
+
+	/*
+		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+		if (d.daily_double) {
+			d.value = d.value.slice(1, d.value.indexOf(","));
+			if (d.value > ddMax) {
+				ddMax = d.value;
+			}
+			if (d.value < ddMin) {
+				ddMin = d.value;
+			}
+			ddAvg.push(d.value);
+			ddSum += d.value;
+		}
+	*/
+
+	data.forEach(function(d) {
+		if (d.round_name == "Final Jeopardy") {
+			d.value.forEach(function(v) {
+				if (v > fjMax) {
+					fjMax = v;
+				}
+				if (v < fjMin) {
+					fjMin = v;
+				}
+				fjAvg.push(v);
+				fjSum += v;
+			});
+		}
+	});
+
+	var format = d3.format(",d");
+
+	d3.selectAll("#fj-stats text.values")
+		.data([fjMax, fjMin, (fjSum/fjAvg.length).toFixed(2)])
+		.transition()
+		.duration(1000).delay(0)
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text().replace(/,/g, ""), d);
+			return function(t) { that.text(format(i(t))); };
+		});
+}
+
+function updateDdOrder(data) {
+	var h = 400,
+		jOrder = (new Array(30)).init(0),
+		djOrder = (new Array(30)).init(0),
+		valueFactor = 5;
+
+	data.forEach(function(d) {
+		if (d.daily_double) {
+			if (d.round_name == "Jeopardy") {
+				jOrder[d.order -1] += 1;
+			}
+			if (d.round_name == "Double Jeopardy") {
+				djOrder[d.order -1] += 1;
+			}
+		}
+	})
+
+	d3.selectAll("#dd-order g.j-order rect")
+		.data(jOrder)
+		.transition().duration(1000)
+		.attr("y", function(d) {
+			return (h / 2) - (d * valueFactor);
+		})
+		.attr("height", function(d) {
+			return d * valueFactor;
+		});
+
+	d3.selectAll("#dd-order g.dj-order rect")
+		.data(djOrder)
+		.transition().duration(1000)
+		.attr("y", function(d) {
+			return (h / 2) - (d * valueFactor);
+		})
+		.attr("height", function(d) {
+			return d * valueFactor;
+		});
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -176,6 +275,8 @@ function updateData(seasonNo) {
 	d3.json("/season?no=" + seasonNo, function(data) {
 		updateHeatmap(data);
 		updateDdStats(data);
+		updateFjStats(data);
+		updateDdOrder(data);
 	})
 }
 
@@ -538,16 +639,6 @@ function ddHeatmap(seasonNo) {
 }
 
 function ddStats(seasonNo) {
-	var stats = d3.select("#dd-stats");
-
-	var title = stats.append("p")
-		.attr("class", "title")
-		.text("Daily Double Stats");
-
-	var values = stats.append("p")
-		.attr("class", "values")
-		.text("");
-
 	//	Data reading method for github.io or just not local webserver					//
 	//	(So I can copy the whole file and just change one part when making changes)		//
 	//////////////////////////////////////////////////////////////////////////////////////
@@ -603,63 +694,275 @@ function ddStats(seasonNo) {
 			}
 		});
 
-		values.text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
+		var format = d3.format(",d");
+
+		var canvas = document.createElement("canvas");
+		var ctx = canvas.getContext("2d");
+		ctx.font = "24px sans-serif";
+
+		var stats = d3.select("#dd-stats")
+			.append("svg")
+			.attr("width", 600)
+			.attr("height", 60);
+
+		var title = stats.append("text")
+			.attr("x", 0)
+			.attr("y", 20)
+			.attr("class", "title")
+			.text("Daily Double Stats");
+
+		var labels = stats.selectAll("text.labels")
+			.data(["Max: ", "Min: ", "Avg: "])
+			.enter().append("text")
+			.attr("class", "labels")
+			.attr("x", function(d, i) {
+				return (i * 200) + 100 - ctx.measureText(d).width;
+			})
+			.attr("y", 55)
+			.text(function(d) {
+				return d;
+			})
+
+		var values = stats.selectAll("text.values")
+			.data([ddMax, ddMin, (ddSum/ddAvg.length).toFixed(2)])
+			.enter().append("text")
+			.attr("class", "values")
+			.attr("x", function(d, i) {
+				return (i * 200) + 100;
+			})
+			.attr("y", 55)
+			.text(function(d) {
+				return format(d);
+			});
 	});
 }
 
-//////////////////////////////////////////////////////////////////
-//	Function for creating a bar graph, from early learning d3	//
-//////////////////////////////////////////////////////////////////
-/*
-function createGraph() {
-	var w = 1400;
-	var h = 600;
-	var barPadding = 2;
+function fjStats(seasonNo) {
+	//	Data reading method for github.io or just not local webserver					//
+	//	(So I can copy the whole file and just change one part when making changes)		//
+	//////////////////////////////////////////////////////////////////////////////////////
+	/*
+	//	Read data from season
+	////////////////////////////
+	d3.csv("/jeopardy-d3js/j-archive-csv/j-archive-season-" + seasonNo + ".csv", function(data) {
 
-	d3.json("/season?no=8", function(data) {
-		var svg = d3.select("#chart")
+		var ddMax = 0,
+			ddMin = Infinity,
+			ddSum = 0,
+			ddAvg = [];
+
+		data.forEach(function(d) {
+			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+			if (d.daily_double) {
+				d.value = d.value.slice(1, d.value.indexOf(","));
+				if (d.value > ddMax) {
+					ddMax = d.value;
+				}
+				if (d.value < ddMin) {
+					ddMin = d.value;
+				}
+				ddAvg.push(d.value);
+				ddSum += d.value;
+			}
+		});
+	*/
+
+	//	Read data from season
+	////////////////////////////
+	d3.json("/season?no=" + seasonNo, function(data) {
+
+		//	Go through each question, totalling the number of
+		//	times a daily double occurs on each grid location
+
+		var fjMax = 0,
+			fjMin = Infinity,
+			fjSum = 0,
+			fjAvg = [];
+
+		data.forEach(function(d) {
+			if (d.round_name == "Final Jeopardy") {
+				d.value.forEach(function(v) {
+					if (v > fjMax) {
+						fjMax = v;
+					}
+					if (v < fjMin) {
+						fjMin = v;
+					}
+					fjAvg.push(v);
+					fjSum += v;
+				});
+			}
+		});
+
+		var format = d3.format(",d");
+
+		var canvas = document.createElement("canvas");
+		var ctx = canvas.getContext("2d");
+		ctx.font = "24px sans-serif";
+
+		var stats = d3.select("#fj-stats")
+			.append("svg")
+			.attr("width", 600)
+			.attr("height", 60);
+
+		var title = stats.append("text")
+			.attr("x", 0)
+			.attr("y", 20)
+			.attr("class", "title")
+			.text("Final Jeopardy Stats");
+
+		var labels = stats.selectAll("text.labels")
+			.data(["Max: ", "Min: ", "Avg: "])
+			.enter().append("text")
+			.attr("class", "labels")
+			.attr("x", function(d, i) {
+				return (i * 200) + 100 - ctx.measureText(d).width;
+			})
+			.attr("y", 55)
+			.text(function(d) {
+				return d;
+			})
+
+		var values = stats.selectAll("text.values")
+			.data([fjMax, fjMin, (fjSum/fjAvg.length).toFixed(2)])
+			.enter().append("text")
+			.attr("class", "values")
+			.attr("x", function(d, i) {
+				return (i * 200) + 100;
+			})
+			.attr("y", 55)
+			.text(function(d) {
+				return format(d);
+			});
+	});
+}
+
+function ddOrder(seasonNo) {
+	var w = 600,
+		h = 500,
+		indChartH = 200,
+		barPadding = 2,
+		jOrder = (new Array(30)).init(0),
+		djOrder = (new Array(30)).init(0),
+		valueFactor = 5;
+
+	d3.json("/season?no=" + seasonNo, function(data) {
+		data.forEach(function(d) {
+			if (d.daily_double) {
+				if (d.round_name == "Jeopardy") {
+					jOrder[d.order -1] += 1;
+				}
+				if (d.round_name == "Double Jeopardy") {
+					djOrder[d.order -1] += 1;
+				}
+			}
+		})
+
+		var chart = d3.select("#dd-order")
 			.append("svg")
 			.attr("width", w)
 			.attr("height", h);
 
-		var dataset = data.slice(40,80);
-		var valueFactor = 10;
-
-		svg.selectAll("rect")
-			.data(dataset)
-			.enter()
-			.append("rect")
-			.attr("x", function(d, i) {
-				return i * (w / dataset.length);
-			})
-			.attr("y", function(d) {
-				return h - (Math.max(...d.value) / valueFactor);
-			})
-			.attr("width", w / dataset.length - barPadding)
-			.attr("height", function(d) {
-				return Math.max(...d.value) / valueFactor;
-			})
-			.attr("fill", function(d) {
-				return "rgb(0, 0, " + (Math.max(...d.value) / valueFactor) + ")";
-			});
-
-		svg.selectAll("text")
-			.data(dataset)
-			.enter()
-			.append("text")
-			.text(function(d) {
-				return (Math.max(...d.value) / valueFactor);
-			})
-			.attr("x", function(d, i) {
-				return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
-			})
-			.attr("y", function(d) {
-				return h - (Math.max(...d.value) / valueFactor) + 15
-			})
+		chart.append("text")
+			.attr("x", 0)
+			.attr("y", 20)
+			.attr("font-size", 24)
 			.attr("font-family", "sans-serif")
-			.attr("font-size", "12px")
-			.attr("fill", "white")
-			.attr("text-anchor", "middle");
+			.attr("fill", "#fff")
+			.text("Daily Double Pick Order");
+
+		var j = chart.append("svg")
+			.attr("width", w)
+			.attr("height", indChartH + 48);
+
+		j.append("text")
+			.attr("x", 10)
+			.attr("y", 48)
+			.attr("font-size", 22)
+			.attr("font-family", "sans-serif")
+			.attr("fill", "#fff")
+			.text("Jeopardy Round");
+
+		j.append("g")
+			.attr("class", "j-order")
+			.selectAll("rect")
+			.data(jOrder)
+			.enter().append("rect")
+			.attr("x", function(d, i) {
+				return i * (w / 30);
+			})
+			.attr("y", function(d) {
+				return indChartH - (d * valueFactor);
+			})
+			.attr("width", w / 30 - barPadding)
+			.attr("height", function(d) {
+				return d * valueFactor;
+			})
+			.attr("fill", "#fff");
+
+		var xScale = d3.scalePoint()
+			.domain(d3.ticks(1,30,30))
+			.range([0, 600 - 21]);
+
+		var xAxis = d3.axisBottom(xScale);
+
+		j.append("g")
+			.attr("transform", function() {
+				return "translate(9, " + (indChartH + 4) + ")";
+			})
+			.call(xAxis);
+
+		var dj = chart.append("svg")
+			.attr("x", 0)
+			.attr("y", 200)
+			.attr("width", w)
+			.attr("height", indChartH + 48);
+
+		dj.append("text")
+			.attr("x", 10)
+			.attr("y", 48)
+			.attr("font-size", 22)
+			.attr("font-family", "sans-serif")
+			.attr("fill", "#fff")
+			.text("Double Jeopardy Round");
+
+		dj.append("g")
+			.attr("class", "dj-order")
+			.selectAll("rect")
+			.data(djOrder)
+			.enter().append("rect")
+			.attr("x", function(d, i) {
+				return i * (w / 30);
+			})
+			.attr("y", function(d) {
+				return indChartH - (d * valueFactor);
+			})
+			.attr("width", w / 30 - barPadding)
+			.attr("height", function(d) {
+				return d * valueFactor;
+			})
+			.attr("fill", "#fff");
+
+		dj.append("g")
+			.attr("transform", function() {
+				return "translate(9, " + (indChartH + 4) + ")";
+			})
+			.call(xAxis);
 	})
 }
-*/
+
+Array.prototype.init = function(x,n)
+{
+    if(typeof(n)=='undefined') { n = this.length; }
+    while (n--) { this[n] = x; }
+    return this;
+}
+
+String.prototype.toArray = function(s)
+{
+	var nums = [];
+	s.slice(1, s.length-1).split(", ").forEach(function(s) {
+		d.push(parseInt(s));
+	})
+	return nums;
+}
