@@ -198,6 +198,7 @@ function updateFjStats(data) {
 
 	data.forEach(function(d) {
 		if (d.round_name == "Final Jeopardy") {
+			d.value = d.value.toArray();
 			d.value.forEach(function(v) {
 				if (v > fjMax) {
 					fjMax = v;
