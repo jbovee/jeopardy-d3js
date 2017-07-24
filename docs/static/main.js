@@ -414,8 +414,8 @@ function ddHeatmap(seasonNo) {
 			d.newCoord[1] = +d.coord[4];
 			if (d.daily_double) {
 				locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
-				colTotals[d.coord[0]-1] += 1;
-				rowTotals[d.coord[1]-1] += 1;
+				colTotals[d.newCoord[0]-1] += 1;
+				rowTotals[d.newCoord[1]-1] += 1;
 			}
 		});
 
