@@ -118,9 +118,6 @@ function updateDdStats(data) {
 		ddAvg = [];
 
 	data.forEach(function(d) {
-		console.log(d.daily_double);
-		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
-		console.log(d.daily_double);
 		if (d.daily_double) {
 			d.value = parseInt(d.value.slice(1, d.value.indexOf(",")));
 			if (d.value > ddMax) {
