@@ -147,8 +147,9 @@ function updateDdStats(data) {
 	*/
 
 	data.forEach(function(d) {
+		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 		if (d.daily_double) {
-			d.value = d.value.slice(1, d.value.indexOf(","));
+			d.value = d.value.toArray()[0];
 			if (d.value > ddMax) {
 				ddMax = d.value;
 			}
