@@ -118,7 +118,9 @@ function updateDdStats(data) {
 		ddAvg = [];
 
 	data.forEach(function(d) {
+		console.log(d.daily_double);
 		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+		console.log(d.daily_double);
 		if (d.daily_double) {
 			d.value = parseInt(d.value.slice(1, d.value.indexOf(",")));
 			if (d.value > ddMax) {
@@ -131,9 +133,6 @@ function updateDdStats(data) {
 			ddSum += d.value;
 		}
 	});
-
-	console.log(ddMax);
-	console.log(ddMin);
 
 	d3.select("#dd-stats").select("p.values").text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
 }
