@@ -570,11 +570,14 @@ function ddStats(seasonNo) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 			if (d.daily_double) {
 				d.value = d.value.slice(1, d.value.indexOf(","));
+				console.log(d.value);
 				if (d.value > ddMax) {
 					ddMax = d.value;
+					console.log(ddMax);
 				}
 				if (d.value < ddMin) {
 					ddMin = d.value;
+					console.log(ddMin);
 				}
 				ddAvg.push(d.value);
 				ddSum += d.value;
