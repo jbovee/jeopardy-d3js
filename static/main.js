@@ -19,6 +19,18 @@ function updateHeatmap(data) {
 		colTotals = [0, 0, 0, 0, 0, 0],
 		rowTotals = [0, 0, 0, 0, 0];
 
+	/*
+		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
+		d.newCoord = [0, 0];
+		d.newCoord[0] = +d.coord[1];
+		d.newCoord[1] = +d.coord[4];
+		if (d.daily_double) {
+			locationTotals[d.newCoord[0]-1][d.newCoord[1]-1] += 1;
+			colTotals[d.newCoord[0]-1] += 1;
+			rowTotals[d.newCoord[1]-1] += 1;
+		}
+	*/
+
 	//	Go through each question, totalling the number of
 	//	times a daily double occurs on each grid location
 	data.forEach(function(d) {
@@ -113,9 +125,24 @@ function updateDdStats(data) {
 		ddSum = 0,
 		ddAvg = [];
 
-	data.forEach(function(d) {
-		d.value = d.value[0];
+	/*
+		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 		if (d.daily_double) {
+			d.value = d.value.slice(1, d.value.indexOf(","));
+			if (d.value > ddMax) {
+				ddMax = d.value;
+			}
+			if (d.value < ddMin) {
+				ddMin = d.value;
+			}
+			ddAvg.push(d.value);
+			ddSum += d.value;
+		}
+	*/
+
+	data.forEach(function(d) {
+		if (d.daily_double) {
+			d.value = d.value[0];
 			if (d.value > ddMax) {
 				ddMax = d.value;
 			}
@@ -563,8 +590,8 @@ function ddStats(seasonNo) {
 			ddAvg = [];
 
 		data.forEach(function(d) {
-			d.value = d.value[0];
 			if (d.daily_double) {
+				d.value = d.value[0];
 				if (d.value > ddMax) {
 					ddMax = d.value;
 				}
