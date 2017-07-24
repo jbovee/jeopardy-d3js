@@ -120,7 +120,7 @@ function updateDdStats(data) {
 	data.forEach(function(d) {
 		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 		if (d.daily_double) {
-			d.value = d.value.slice(1, d.value.indexOf(","));
+			d.value = parseInt(d.value.slice(1, d.value.indexOf(",")));
 			if (d.value > ddMax) {
 				ddMax = d.value;
 			}
@@ -569,15 +569,12 @@ function ddStats(seasonNo) {
 		data.forEach(function(d) {
 			d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 			if (d.daily_double) {
-				d.value = d.value.slice(1, d.value.indexOf(","));
-				console.log(d.value);
+				d.value = parseInt(d.value.slice(1, d.value.indexOf(",")));
 				if (d.value > ddMax) {
 					ddMax = d.value;
-					console.log(ddMax);
 				}
 				if (d.value < ddMin) {
 					ddMin = d.value;
-					console.log(ddMin);
 				}
 				ddAvg.push(d.value);
 				ddSum += d.value;
