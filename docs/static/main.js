@@ -132,6 +132,9 @@ function updateDdStats(data) {
 		}
 	});
 
+	console.log(ddMax);
+	console.log(ddMin);
+
 	d3.select("#dd-stats").select("p.values").text("Max: " + ddMax + ", Min: " + ddMin + ", Avg: " + (ddSum/ddAvg.length).toFixed(2));
 }
 
