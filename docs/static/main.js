@@ -226,10 +226,11 @@ function updateFjStats(data) {
 }
 
 function updateDdOrder(data) {
-	var h = 400,
+	var indChartH = 240,
 		jOrder = (new Array(30)).init(0),
 		djOrder = (new Array(30)).init(0),
-		valueFactor = 5;
+		valueFactor = 5,
+		format = d3.format(",d");
 
 	data.forEach(function(d) {
 		if (d.daily_double) {
@@ -246,20 +247,44 @@ function updateDdOrder(data) {
 		.data(jOrder)
 		.transition().duration(1000)
 		.attr("y", function(d) {
-			return (h / 2) - (d * valueFactor);
+			return indChartH - (d * valueFactor);
 		})
 		.attr("height", function(d) {
 			return d * valueFactor;
+		});
+
+	d3.selectAll("#dd-order g.j-order text.bar")
+		.data(jOrder)
+		.transition().duration(1000).delay(0)
+		.attr("y", function(d) {
+			return indChartH - (d * valueFactor) - 6;
+		})
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text(), d);
+			return function(t) { that.text(format(i(t))); };
 		});
 
 	d3.selectAll("#dd-order g.dj-order rect")
 		.data(djOrder)
 		.transition().duration(1000)
 		.attr("y", function(d) {
-			return (h / 2) - (d * valueFactor);
+			return indChartH - (d * valueFactor);
 		})
 		.attr("height", function(d) {
 			return d * valueFactor;
+		});
+
+	d3.selectAll("#dd-order g.dj-order text.bar")
+		.data(djOrder)
+		.transition().duration(1000).delay(0)
+		.attr("y", function(d) {
+			return indChartH - (d * valueFactor) - 6;
+		})
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text(), d);
+			return function(t) { that.text(format(i(t))); };
 		});
 }
 
@@ -849,8 +874,8 @@ function fjStats(seasonNo) {
 
 function ddOrder(seasonNo) {
 	var w = 600,
-		h = 500,
-		indChartH = 200,
+		h = 540,
+		indChartH = 280,
 		barPadding = 2,
 		jOrder = (new Array(30)).init(0),
 		djOrder = (new Array(30)).init(0),
@@ -894,9 +919,10 @@ function ddOrder(seasonNo) {
 			.attr("fill", "#fff")
 			.text("Jeopardy Round");
 
-		j.append("g")
-			.attr("class", "j-order")
-			.selectAll("rect")
+		var jg = j.append("g")
+			.attr("class", "j-order");
+
+		jg.selectAll("rect")
 			.data(jOrder)
 			.enter().append("rect")
 			.attr("x", function(d, i) {
@@ -910,6 +936,22 @@ function ddOrder(seasonNo) {
 				return d * valueFactor;
 			})
 			.attr("fill", "#fff");
+
+		jg.selectAll("text.bar")
+			.data(jOrder)
+			.enter().append("text")
+			.attr("class", "bar")
+			.attr("text-anchor", "middle")
+			.attr("font-size", 10)
+			.attr("font-family", "sans-serif")
+			.attr("fill", "#fff")
+			.attr("x", function(d, i) {
+				return i * (w / 30) + (w / 60) - 2;
+			})
+			.attr("y", function(d) {
+				return indChartH - (d * valueFactor) - 6;
+			})
+			.text(function(d) { return d; });
 
 		var xScale = d3.scalePoint()
 			.domain(d3.ticks(1,30,30))
@@ -925,7 +967,7 @@ function ddOrder(seasonNo) {
 
 		var dj = chart.append("svg")
 			.attr("x", 0)
-			.attr("y", 200)
+			.attr("y", indChartH)
 			.attr("width", w)
 			.attr("height", indChartH + 48);
 
@@ -937,9 +979,10 @@ function ddOrder(seasonNo) {
 			.attr("fill", "#fff")
 			.text("Double Jeopardy Round");
 
-		dj.append("g")
-			.attr("class", "dj-order")
-			.selectAll("rect")
+		var djg = dj.append("g")
+			.attr("class", "dj-order");
+
+		djg.selectAll("rect")
 			.data(djOrder)
 			.enter().append("rect")
 			.attr("x", function(d, i) {
@@ -953,6 +996,22 @@ function ddOrder(seasonNo) {
 				return d * valueFactor;
 			})
 			.attr("fill", "#fff");
+
+		djg.selectAll("text.bar")
+			.data(djOrder)
+			.enter().append("text")
+			.attr("class", "bar")
+			.attr("text-anchor", "middle")
+			.attr("font-size", 10)
+			.attr("font-family", "sans-serif")
+			.attr("fill", "#fff")
+			.attr("x", function(d, i) {
+				return i * (w / 30) + (w / 60) - 2;
+			})
+			.attr("y", function(d) {
+				return indChartH - (d * valueFactor) - 6;
+			})
+			.text(function(d) { return d; });
 
 		dj.append("g")
 			.attr("transform", function() {
