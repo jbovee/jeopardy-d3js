@@ -971,7 +971,7 @@ String.prototype.toArray = function()
 {
 	var nums = [];
 	this.slice(1, this.length-1).split(", ").forEach(function(s) {
-		d.push(parseInt(s));
+		nums.push(parseInt(s));
 	})
 	return nums;
 }
