@@ -147,17 +147,18 @@ function updateDdStats(data) {
 	*/
 
 	data.forEach(function(d) {
-		d.daily_double = (d.daily_double == "true" || d.daily_double == "True") ? Boolean(true):Boolean(false);
 		if (d.daily_double) {
-			d.value = d.value.toArray()[0];
-			if (d.value > ddMax) {
-				ddMax = d.value;
+			d.value = d.value.toArray();
+			d.value.forEach(function(v) {
+				if (d.value > ddMax) {
+					ddMax = d.value;
+				}
+				if (d.value < ddMin) {
+					ddMin = d.value;
+				}
+				ddAvg.push(d.value);
+				ddSum += d.value;
 			}
-			if (d.value < ddMin) {
-				ddMin = d.value;
-			}
-			ddAvg.push(d.value);
-			ddSum += d.value;
 		}
 	});
 
@@ -197,7 +198,6 @@ function updateFjStats(data) {
 
 	data.forEach(function(d) {
 		if (d.round_name == "Final Jeopardy") {
-			d.value = d.value.toArray();
 			d.value.forEach(function(v) {
 				if (v > fjMax) {
 					fjMax = v;
