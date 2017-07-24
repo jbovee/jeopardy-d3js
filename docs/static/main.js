@@ -150,14 +150,14 @@ function updateDdStats(data) {
 		if (d.daily_double) {
 			d.value = d.value.toArray();
 			d.value.forEach(function(v) {
-				if (d.value > ddMax) {
-					ddMax = d.value;
+				if (v > ddMax) {
+					ddMax = v;
 				}
-				if (d.value < ddMin) {
-					ddMin = d.value;
+				if (v < ddMin) {
+					ddMin = v;
 				}
-				ddAvg.push(d.value);
-				ddSum += d.value;
+				ddAvg.push(v);
+				ddSum += v;
 			}
 		}
 	});
