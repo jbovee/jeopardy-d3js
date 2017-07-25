@@ -12,13 +12,24 @@
     <link href={{ url_for('static', filename='main.css') }} rel="stylesheet" media="screen">
   </head>
   <body>
-    <div id="heatmap" class="container">
-      <div id="slider"></div>
-      <div id="grid"></div>
+    <div class="container">
+        <div class="col-sm-8 col-sm-offset-2">
+            <svg viewBox="0 0 600 100">
+                <text class="main-title" x="0" y="80">Jeopardy Visualizations</text>
+            </svg>
+            <div id="slider" class="v-spaced"></div>
+            <div id="heatmap">
+                <div id="title"></div>
+                <div id="grid"></div>
+            </div>
+            <div id="stats" class="v-spaced">
+                <div id="dd-stats"></div>
+                <div id="fj-stats"></div>
+            </div>
+            <div id="missed-stats" class="v-spaced"></div>
+            <div id="dd-order" class="v-spaced"></div>
+        </div>
     </div>
-    <div id="dd-stats" class="container"></div>
-    <div id="fj-stats" class="container"></div>
-    <div id="dd-order" class="container"></div>
     <!--
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>

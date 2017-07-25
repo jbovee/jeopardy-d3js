@@ -2,32 +2,49 @@ body {
 	background-color: grey
 }
 
-.container {
-	padding-top: 20px;
+svg {
+	width: 100%;
+	height: auto;
 }
 
-#dd-stats svg text {
+.main-title {
+	font-family: sans-serif;
+	font-size: 56px;
+	fill: #fff;
+}
+
+.title {
+	font-family: sans-serif;
+	font-size: 36px;
+	fill: #fff;
+}
+
+.v-spaced {
+	padding-top: 28px;
+}
+
+#dd-stats svg text.labels {
 	font-family: sans-serif;
 	font-size: 24px;
 	fill: #fff;
 }
 
-#dd-stats p.title {
-	font-family: sans-serif;
-	font-size: 28px;
-	color: #fff;
-}
-
-#fj-stats svg text {
+#dd-stats svg text.values {
 	font-family: sans-serif;
 	font-size: 24px;
 	fill: #fff;
 }
 
-#fj-stats p.title {
+#fj-stats svg text.labels {
 	font-family: sans-serif;
-	font-size: 28px;
-	color: #fff;
+	font-size: 24px;
+	fill: #fff;
+}
+
+#fj-stats svg text.values {
+	font-family: sans-serif;
+	font-size: 24px;
+	fill: #fff;
 }
 
 #slider path {
@@ -56,7 +73,7 @@ body {
 
 #seasons-slider {
 	overflow: hidden;
-	width: 600px;
+	width: 100%;
 }
 
 #seasons-slider-value {

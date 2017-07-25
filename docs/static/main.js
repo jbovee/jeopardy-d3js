@@ -344,6 +344,8 @@ function seasonSlider() {
 	slider.append("svg")
 		.attr("width", 600)
 		.attr("height", 30)
+		.attr("viewBox", "0 0 600 30")
+		.attr("preserveAspectRatio", "xMinYMax meet")
 		.append("g")
 		.attr("transform", "translate(5, 4)")
 		.call(xAxis);
@@ -382,6 +384,16 @@ function ddHeatmap(seasonNo) {
 		colTotals = [0, 0, 0, 0, 0, 0],
 		rowTotals = [0, 0, 0, 0, 0];
 
+	var title = d3.select("#heatmap #title")
+		.append("svg")
+		.attr("viewBox", "0 0 600 60")
+		.attr("preserveAspectRatio", "xMinYMax meet")
+		.append("text")
+		.attr("class", "title")
+		.attr("x", 0)
+		.attr("y", 40)
+		.text("Daily Double Location Heatmap");
+
 	//////////////////////////////////////////
 	//	Create Daily Double Heatmap Grid	//
 	//////////////////////////////////////////
@@ -390,7 +402,9 @@ function ddHeatmap(seasonNo) {
 	var grid = d3.select("#grid")
 		.append("svg")
 		.attr("width", (cols + 1) * cellWidth + 10)
-		.attr("height", (rows + 1) * cellHeight + 10);
+		.attr("height", (rows + 1) * cellHeight + 10)
+		.attr("viewBox", "0 0 " + ((cols + 1) * cellWidth + 1) + " " + ((rows + 1) * cellHeight + 10))
+		.attr("preserveAspectRatio", "xMinYMax meet");
 
 	//	Color scale from white to blue. Domain assigned later
 	var colors = d3.scaleLinear()
@@ -737,11 +751,13 @@ function ddStats(seasonNo) {
 		var stats = d3.select("#dd-stats")
 			.append("svg")
 			.attr("width", 600)
-			.attr("height", 60);
+			.attr("height", 100)
+			.attr("viewBox", "0 0 600 60")
+			.attr("preserveAspectRatio", "xMinYMax meet");
 
 		var title = stats.append("text")
 			.attr("x", 0)
-			.attr("y", 20)
+			.attr("y", 0)
 			.attr("class", "title")
 			.text("Daily Double Stats");
 
@@ -752,7 +768,7 @@ function ddStats(seasonNo) {
 			.attr("x", function(d, i) {
 				return (i * 200) + 100 - ctx.measureText(d).width;
 			})
-			.attr("y", 55)
+			.attr("y", 44)
 			.text(function(d) {
 				return d;
 			})
@@ -764,7 +780,7 @@ function ddStats(seasonNo) {
 			.attr("x", function(d, i) {
 				return (i * 200) + 100;
 			})
-			.attr("y", 55)
+			.attr("y", 44)
 			.text(function(d) {
 				return format(d);
 			});
@@ -838,11 +854,13 @@ function fjStats(seasonNo) {
 		var stats = d3.select("#fj-stats")
 			.append("svg")
 			.attr("width", 600)
-			.attr("height", 60);
+			.attr("height", 100)
+			.attr("viewBox", "0 0 600 60")
+			.attr("preserveAspectRatio", "xMinYMax meet");
 
 		var title = stats.append("text")
 			.attr("x", 0)
-			.attr("y", 20)
+			.attr("y", 0)
 			.attr("class", "title")
 			.text("Final Jeopardy Stats");
 
@@ -853,7 +871,7 @@ function fjStats(seasonNo) {
 			.attr("x", function(d, i) {
 				return (i * 200) + 100 - ctx.measureText(d).width;
 			})
-			.attr("y", 55)
+			.attr("y", 44)
 			.text(function(d) {
 				return d;
 			})
@@ -865,7 +883,7 @@ function fjStats(seasonNo) {
 			.attr("x", function(d, i) {
 				return (i * 200) + 100;
 			})
-			.attr("y", 55)
+			.attr("y", 44)
 			.text(function(d) {
 				return format(d);
 			});
@@ -897,19 +915,21 @@ function ddOrder(seasonNo) {
 		var chart = d3.select("#dd-order")
 			.append("svg")
 			.attr("width", w)
-			.attr("height", h);
+			.attr("height", h + 10)
+			.attr("viewBox", "0 0 " + w + " " + h)
+			.attr("preserveAspectRatio", "xMinYMax meet");
 
 		chart.append("text")
 			.attr("x", 0)
 			.attr("y", 20)
-			.attr("font-size", 24)
-			.attr("font-family", "sans-serif")
-			.attr("fill", "#fff")
+			.attr("class", "title")
 			.text("Daily Double Pick Order");
 
 		var j = chart.append("svg")
 			.attr("width", w)
-			.attr("height", indChartH + 48);
+			.attr("height", indChartH + 48)
+			.attr("viewBox", "0 0 " + w + " " + (indChartH + 48))
+			.attr("preserveAspectRatio", "xMinYMax meet");
 
 		j.append("text")
 			.attr("x", 10)
@@ -920,7 +940,7 @@ function ddOrder(seasonNo) {
 			.text("Jeopardy Round");
 
 		var jg = j.append("g")
-			.attr("class", "j-order");
+			.attr("class", "j-order")
 
 		jg.selectAll("rect")
 			.data(jOrder)
@@ -969,7 +989,9 @@ function ddOrder(seasonNo) {
 			.attr("x", 0)
 			.attr("y", indChartH)
 			.attr("width", w)
-			.attr("height", indChartH + 48);
+			.attr("height", indChartH + 48)
+			.attr("viewBox", "0 0 " + w + " " + (indChartH + 48))
+			.attr("preserveAspectRatio", "xMinYMax meet");
 
 		dj.append("text")
 			.attr("x", 10)
@@ -980,7 +1002,7 @@ function ddOrder(seasonNo) {
 			.text("Double Jeopardy Round");
 
 		var djg = dj.append("g")
-			.attr("class", "dj-order");
+			.attr("class", "dj-order")
 
 		djg.selectAll("rect")
 			.data(djOrder)
@@ -1020,6 +1042,30 @@ function ddOrder(seasonNo) {
 			.call(xAxis);
 	})
 }
+
+/*
+//	Work in progress	//
+function missedStats(seasonNo) {
+	var height = 200,
+		width = 600,
+		radius = 100;
+
+	var svg = d3.select("#missed-stats")
+		.append("svg");
+
+	var missedQ = svg.append("g")
+		.attr("class", "missed-fj")
+
+	missedQ.append("g")
+		.attr("class", "slices");
+	missedQ.append("g")
+		.attr("class", "labelName");
+	missedQ.append("g")
+		.attr("class", "labelValue");
+	missedQ.append("g")
+		.attr("class", "lines");
+}
+*/
 
 Array.prototype.init = function(x,n)
 {
