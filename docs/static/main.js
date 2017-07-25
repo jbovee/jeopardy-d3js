@@ -893,7 +893,7 @@ function fjStats(seasonNo) {
 function ddOrder(seasonNo) {
 	var w = 600,
 		h = 580,
-		indChartH = 280,
+		indChartH = 240,
 		barPadding = 2,
 		jOrder = (new Array(30)).init(0),
 		djOrder = (new Array(30)).init(0),
