@@ -1,7 +1,7 @@
 //	The function that runs when the page loads
 $(function() {
 	var initSeason = 1
-	seasonSlider(initSeason);
+	seasonSlider();
 	ddHeatmap(initSeason);
 	ddStats(initSeason);
 	fjStats(initSeason);
@@ -377,6 +377,7 @@ function seasonSlider() {
 			.attr("font-weight", "none")
 			.attr("y", 9)
 			.duration(1000);
+	}
 }
 
 //////////////////////////////////////////////////////
