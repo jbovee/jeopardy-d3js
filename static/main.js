@@ -1,10 +1,11 @@
 //	The function that runs when the page loads
 $(function() {
+	var initSeason = 1;
 	seasonSlider();
-	ddHeatmap(1);
-	ddStats(1);
-	fjStats(1);
-	ddOrder(1);
+	ddHeatmap(initSeason);
+	ddStats(initSeason);
+	fjStats(initSeason);
+	ddOrder(initSeason);
 	//createGraph();
 });
 
@@ -309,10 +310,9 @@ function seasonSlider() {
 	//////////////////////////////////////////////
 	//	Create Slider for Changing Season Data	//
 	//////////////////////////////////////////////
-	var numSeasons = 33;
-	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
+	var numSeasons = 33,
+		seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
 
-	
 	var slider = d3.select("#slider");
 
 	//	Slider
@@ -326,6 +326,7 @@ function seasonSlider() {
 		.attr("list", seasons)
 		.on("change", function() {
 			updateData(this.value);
+			tickZoom(this.value);
 		});
 
 	var xScale = d3.scalePoint()
@@ -342,6 +343,33 @@ function seasonSlider() {
 		.append("g")
 		.attr("transform", "translate(5, 4)")
 		.call(xAxis);
+
+	d3.selectAll("#slider text")
+		.data(seasons)
+		.attr("class", function(d) {
+			return "tick-" + d;
+		})
+		.attr("font-size", "1em");
+
+	function tickZoom(tickNo) {
+		d3.select("#slider text.tick-" + tickNo)
+			.transition()
+			.attr("class", "tick-zm")
+			.attr("font-size", "1.4em")
+			.attr("font-weight", "bold")
+			.attr("y", 10)
+			.duration(1000);
+
+		d3.select("#slider text.tick-zm")
+			.transition()
+			.attr("class", function() {
+				return "tick-" + d3.select("#slider text.tick-zm").text();
+			})
+			.attr("font-size", "1em")
+			.attr("font-weight", "none")
+			.attr("y", 9)
+			.duration(1000);
+	}
 }
 
 //////////////////////////////////////////////////////
@@ -1070,4 +1098,21 @@ String.prototype.toArray = function(s)
 		d.push(parseInt(s));
 	})
 	return nums;
+}
+
+//	I've realized I don't actually need this, but I like it so it's staying here
+Number.prototype.toUniqueChars = function()
+{
+	//	Not for negative numbers
+	var alpha = "abcdefghijklmnopqrstuvwxyz",
+		res = "";
+	if (this < 27) {
+		res = alpha[this-1];
+	}
+	else {
+		for (i = 0; i < Math.floor(this/26) + 1; i++) {
+			res += alpha[(this-1)%26];
+		}
+	}
+	return res;
 }
