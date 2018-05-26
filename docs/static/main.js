@@ -321,7 +321,7 @@ function seasonSlider() {
 		.min(1)
 		.max(numSeasons)
 		.step(1)
-		.width(710)
+		.width(690)
 		.tickValues(seasons)
 		.on('end', val => {
 			updateData(val);
@@ -330,6 +330,8 @@ function seasonSlider() {
 	var g = d3.select("div#slider").append("svg")
 		.attr("width", 710)
 		.attr("height", 55)
+		.attr("viewBox", "0 0 710 55")
+		.attr("preserveAspectRatio", "xMinYMax meet")
 		.append("g")
 		.attr("transform", "translate(10,10)")
 		.call(slider2);
