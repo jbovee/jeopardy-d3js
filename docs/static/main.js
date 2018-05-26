@@ -314,70 +314,25 @@ function updateData(seasonNo) {
 }
 
 function seasonSlider() {
-	//////////////////////////////////////////////
-	//	Create Slider for Changing Season Data	//
-	//////////////////////////////////////////////
-	var numSeasons = 33;
-	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
+	var numSeasons = 33,
+		seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
 
-	
-	var slider = d3.select("#slider");
-
-	//	Slider
-	slider.append("input")
-		.attr("name", "seasons-slider")
-		.attr("id", "seasons-slider")
-		.attr("type", "range")
-		.attr("value", Math.min.apply(Math, seasons))
-		.attr("min", Math.min.apply(Math, seasons))
-		.attr("max", Math.max.apply(Math, seasons))
-		.attr("list", seasons)
-		.on("change", function() {
-			updateData(this.value);
-			tickZoom(this.value);
+	var slider2 = d3.sliderHorizontal()
+		.min(1)
+		.max(numSeasons)
+		.step(1)
+		.width(710)
+		.tickValues(seasons)
+		.on('end', val => {
+			updateData(val);
 		});
 
-	var xScale = d3.scalePoint()
-		.domain(seasons)
-		.range([0, 600 - 11]);
-
-	var xAxis = d3.axisBottom(xScale);
-
-	slider.append("svg")
-		.attr("width", 600)
-		.attr("height", 30)
-		.attr("viewBox", "0 0 600 30")
-		.attr("preserveAspectRatio", "xMinYMax meet")
+	var g = d3.select("div#slider").append("svg")
+		.attr("width", 710)
+		.attr("height", 55)
 		.append("g")
-		.attr("transform", "translate(5, 4)")
-		.call(xAxis);
-
-	d3.selectAll("#slider text")
-		.data(seasons)
-		.attr("class", function(d) {
-			return "tick-" + d;
-		})
-		.attr("font-size", "1em");
-
-	function tickZoom(tickNo) {
-		d3.select("#slider text.tick-" + tickNo)
-			.transition()
-			.attr("class", "tick-zm")
-			.attr("font-size", "1.4em")
-			.attr("font-weight", "bold")
-			.attr("y", 10)
-			.duration(1000);
-
-		d3.select("#slider text.tick-zm")
-			.transition()
-			.attr("class", function() {
-				return "tick-" + d3.select("#slider text.tick-zm").text();
-			})
-			.attr("font-size", "1em")
-			.attr("font-weight", "none")
-			.attr("y", 9)
-			.duration(1000);
-	}
+		.attr("transform", "translate(10,10)")
+		.call(slider2);
 }
 
 //////////////////////////////////////////////////////

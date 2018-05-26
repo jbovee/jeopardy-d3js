@@ -47,15 +47,8 @@ svg {
 	fill: #fff;
 }
 
-#slider path {
-	display: none;
-}
-
-#slider svg line {
-	stroke: #fff;
-}
-
-#slider svg text {
+.parameter-value text {
+	font-size: 14px;
 	fill: #fff;
 }
 
@@ -69,15 +62,4 @@ svg {
 
 #dd-order svg text {
 	fill: #fff;
-}
-
-#seasons-slider {
-	overflow: hidden;
-	width: 100%;
-}
-
-#seasons-slider-value {
-	font-family: sans-serif;
-	font-size: 24px;
-	color: #fff;
 }
