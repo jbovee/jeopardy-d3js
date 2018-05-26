@@ -17,7 +17,7 @@
             <svg viewBox="0 0 600 100">
                 <text class="main-title" x="0" y="80">Jeopardy Visualizations</text>
             </svg>
-            <div id="slider" class="v-spaced"></div>
+            <div id="slider"></div>
             <div id="heatmap">
                 <div id="title"></div>
                 <div id="grid"></div>
@@ -39,6 +39,7 @@
     <script src={{ url_for('static', filename='./bower_components/jquery/dist/jquery.min.js') }}></script>
     <script src={{ url_for('static', filename='./bower_components/bootstrap/dist/js/bootstrap.min.js') }}></script>
     <script src={{ url_for('static', filename='./bower_components/d3/d3.min.js') }}></script>
+    <script src="https://unpkg.com/d3-simple-slider@0.2.1/build/d3-simple-slider.js"></script>
     <script src={{ url_for('static', filename='./bower_components/d3-tip/index.js') }}></script>
     <script src={{ url_for('static', filename='main.js') }}></script>
   </body>
