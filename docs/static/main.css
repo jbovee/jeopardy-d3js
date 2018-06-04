@@ -47,11 +47,6 @@ svg {
 	fill: #fff;
 }
 
-.parameter-value text {
-	font-size: 14px;
-	fill: #fff;
-}
-
 #dd-order path {
 	display: none;
 }
@@ -61,5 +56,12 @@ svg {
 }
 
 #dd-order svg text {
+	fill: #fff;
+}
+
+#slider .parameter-value text {
+	font-size: 14px;
+	-webkit-transition: fill 1s;
+	transition: fill 1s;
 	fill: #fff;
 }
