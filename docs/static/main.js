@@ -313,6 +313,293 @@ function updateData(seasonNo) {
 	})
 }
 
+function updateDataAllSeasons() {
+	var indChartH = 240,
+		valueFactor = 5;
+
+	var locationTotals = [
+		[6, 338, 959, 1300, 903],
+		[2, 191, 585, 818, 511],
+		[4, 271, 817, 1187, 801],
+		[3, 223, 799, 1095, 814],
+		[4, 267, 779, 1097, 724],
+		[4, 178, 578, 761, 546]
+	],
+		colTotals = [3506, 2107, 3080, 2934, 2871, 2067],
+		rowTotals = [23, 1468, 4517, 6258, 4299],
+		ddMax = 19000,
+		ddMin = 5,
+		ddAvg = 1923,
+		fjMax = 30000,
+		fjMin = 0,
+		fjAvg = 4931,
+		jOrder = [19,78,151,252,241,123,130,180,253,273,141,148,197,226,244,119,134,193,210,255,135,181,191,241,248,155,164,190,286,188],
+		djOrder = [48,159,378,490,425,267,270,393,420,432,317,326,384,475,437,301,292,437,461,456,288,325,428,517,435,315,352,446,455,290];
+
+	arr = locationTotals.reduce(function iter(r, a) {
+		return r.concat(a);
+	}, []);
+
+	//	Update color range
+	var colors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, arr) * 10]);
+
+	var rowColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, rowTotals) * 10]);
+
+	var colColors = d3.scaleLinear()
+		.interpolate(d3.interpolateHcl)
+		.range([d3.rgb(startColor), d3.rgb(endColor)])
+		.domain([1, Math.max.apply(null, colTotals) * 10]);
+
+	//	Update heat cells and tooltips to new season
+	//////////////////////////////////////////////////
+	var gCol = d3.select("#grid")
+		.selectAll("g.col")
+		.data(locationTotals);
+
+	var gColRows = d3.select("#grid")
+		.select("g.rowTotals");
+
+	var gColCols = d3.select("#grid")
+		.select("g.colTotals");
+
+	//	Change the color of all heat cells
+	gCol.selectAll("rect.heatCell")
+		.data(function(d) {return d;})
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return colors(d * 10);
+		});
+
+	//	Change the text in tooltips
+	gCol.selectAll("text.tip")
+		.data(function(d) {return d;})
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+
+	gColRows.selectAll("rect.heatRow")
+		.data(rowTotals)
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return rowColors(d * 10);
+		});
+
+	gColRows.selectAll("text.rowTip")
+		.data(rowTotals)
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+
+	gColCols.selectAll("rect.heatCol")
+		.data(colTotals)
+		.transition().duration(1000)
+		.attr("fill", function(d) {
+			return colColors(d * 10);
+		});
+
+	gColCols.selectAll("text.colTip")
+		.data(colTotals)
+		.transition().duration(1000)
+		.text(function(d) {
+			return d;
+		});
+
+	var format = d3.format(",d");
+
+	d3.selectAll("#dd-stats text.values")
+		.data([ddMax, ddMin, ddAvg])
+		.transition()
+		.duration(1000).delay(0)
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text().replace(/,/g, ""), d);
+			return function(t) { that.text(format(i(t))); };
+		});
+
+	d3.selectAll("#fj-stats text.values")
+		.data([fjMax, fjMin, fjAvg])
+		.transition()
+		.duration(1000).delay(0)
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text().replace(/,/g, ""), d);
+			return function(t) { that.text(format(i(t))); };
+		});
+
+	d3.selectAll("#dd-order g.j-order rect")
+		.data(jOrder)
+		.transition().duration(1000)
+		.attr("y", function(d) {
+			return indChartH - (d * valueFactor);
+		})
+		.attr("height", function(d) {
+			return d * valueFactor;
+		});
+
+	d3.selectAll("#dd-order g.j-order text.bar")
+		.data(jOrder)
+		.transition().duration(1000).delay(0)
+		.attr("y", function(d) {
+			return indChartH - (d * valueFactor) - 6;
+		})
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text(), d);
+			return function(t) { that.text(format(i(t))); };
+		});
+
+	d3.selectAll("#dd-order g.dj-order rect")
+		.data(djOrder)
+		.transition().duration(1000)
+		.attr("y", function(d) {
+			return indChartH - (d * valueFactor);
+		})
+		.attr("height", function(d) {
+			return d * valueFactor;
+		});
+
+	d3.selectAll("#dd-order g.dj-order text.bar")
+		.data(djOrder)
+		.transition().duration(1000).delay(0)
+		.attr("y", function(d) {
+			return indChartH - (d * valueFactor) - 6;
+		})
+		.tween("text", function(d) {
+			var that = d3.select(this),
+				i = d3.interpolateNumber(that.text(), d);
+			return function(t) { that.text(format(i(t))); };
+		});
+}
+
+/*
+//Function for calculating heatmap values for all seasons together.
+function allSeasonsData() {
+	var locationTotals = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		colTotals = [0, 0, 0, 0, 0, 0],
+		rowTotals = [0, 0, 0, 0, 0];
+
+	var ddMax = 0,
+		ddMin = Infinity,
+		ddSum = 0,
+		ddAvg = [];
+
+	var fjMax = 0,
+		fjMin = Infinity,
+		fjSum = 0,
+		fjAvg = [];
+
+	var jOrder = (new Array(30)).init(0),
+		djOrder = (new Array(30)).init(0);
+
+	d3.queue()
+		.defer(d3.json, "/season?no=1")
+		.defer(d3.json, "/season?no=2")
+		.defer(d3.json, "/season?no=3")
+		.defer(d3.json, "/season?no=4")
+		.defer(d3.json, "/season?no=5")
+		.defer(d3.json, "/season?no=6")
+		.defer(d3.json, "/season?no=7")
+		.defer(d3.json, "/season?no=8")
+		.defer(d3.json, "/season?no=9")
+		.defer(d3.json, "/season?no=10")
+		.defer(d3.json, "/season?no=11")
+		.defer(d3.json, "/season?no=12")
+		.defer(d3.json, "/season?no=13")
+		.defer(d3.json, "/season?no=14")
+		.defer(d3.json, "/season?no=15")
+		.defer(d3.json, "/season?no=16")
+		.defer(d3.json, "/season?no=17")
+		.defer(d3.json, "/season?no=18")
+		.defer(d3.json, "/season?no=19")
+		.defer(d3.json, "/season?no=20")
+		.defer(d3.json, "/season?no=21")
+		.defer(d3.json, "/season?no=22")
+		.defer(d3.json, "/season?no=23")
+		.defer(d3.json, "/season?no=24")
+		.defer(d3.json, "/season?no=25")
+		.defer(d3.json, "/season?no=26")
+		.defer(d3.json, "/season?no=27")
+		.defer(d3.json, "/season?no=28")
+		.defer(d3.json, "/season?no=29")
+		.defer(d3.json, "/season?no=30")
+		.defer(d3.json, "/season?no=31")
+		.defer(d3.json, "/season?no=32")
+		.defer(d3.json, "/season?no=33")
+		.await(function(error, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33) {
+			if (error) {
+				console.error("Something went wrong: " + error);
+			} else {
+				files = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33];
+				files.forEach(function(data) {
+					data.forEach(function(d) {
+						if (d.daily_double) {
+							locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+							colTotals[d.coord[0]-1] += 1;
+							rowTotals[d.coord[1]-1] += 1;
+
+							d.value = d.value[0];
+							if (d.value > ddMax) {
+								ddMax = d.value;
+							}
+							if (d.value < ddMin) {
+								ddMin = d.value;
+							}
+							ddAvg.push(d.value);
+							ddSum += d.value;
+
+							if (d.round_name == "Jeopardy") {
+								jOrder[d.order -1] += 1;
+							}
+							if (d.round_name == "Double Jeopardy") {
+								djOrder[d.order -1] += 1;
+							}
+						}
+						if (d.round_name == "Final Jeopardy") {
+							d.value.forEach(function(v) {
+								if (v > fjMax) {
+									fjMax = v;
+								}
+								if (v < fjMin) {
+									fjMin = v;
+								}
+								fjAvg.push(v);
+								fjSum += v;
+							});
+						}
+					});
+				});
+			}
+			console.log(locationTotals);
+			console.log(colTotals);
+			console.log(rowTotals);
+
+			console.log("DDMax: " + ddMax);
+			console.log("DDMin: " + ddMin);
+			console.log("DDAvg: " + (ddSum/ddAvg.length).toFixed(2))
+			console.log("FJMax: " + fjMax);
+			console.log("FJMin: " + fjMin);
+			console.log("FJAvg: " + (fjSum/fjAvg.length).toFixed(2))
+			console.log(jOrder);
+			console.log(djOrder);
+		});
+}
+*/
+
 function seasonSlider() {
 	var numSeasons = 33,
 		seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
@@ -328,13 +615,58 @@ function seasonSlider() {
 		});
 
 	var g = d3.select("div#slider").append("svg")
-		.attr("width", 710)
+		.attr("width", 675)
 		.attr("height", 55)
 		.attr("viewBox", "0 0 710 55")
 		.attr("preserveAspectRatio", "xMinYMax meet")
 		.append("g")
 		.attr("transform", "translate(10,10)")
 		.call(slider2);
+}
+
+function allSeasons() {
+	var svg = d3.select("div#all-seasons-button").append("svg")
+		.attr("width", 55)
+		.attr("height", 55)
+		.attr("viewBox", "0 0 55 55")
+		.attr("preserveAspectRatio", "xMinYMax meet");
+
+	var g = svg.append("g");
+
+	g.append("rect")
+		.attr("x", 5)
+		.attr("y", 5)
+		.attr("width", 45)
+		.attr("height", 45)
+		.attr("rx", 10)
+		.attr("ry", 10)
+		.attr("z-index", 2);
+
+	g.append("text")
+		.attr("x", 27.5)
+		.attr("y", 27.5)
+		.attr("text-anchor", "middle")
+		.attr("alignment-baseline", "central")
+		.text("All");
+
+	var gClick = svg.append("g")
+		.attr("opacity", 0)
+		.append("rect")
+		.attr("x", 5)
+		.attr("y", 5)
+		.attr("width", 45)
+		.attr("height", 45)
+		.attr("rx", 10)
+		.attr("ry", 10)
+		.on("click", function() {
+			$(this.parentNode.parentNode).toggleClass("active");
+			$("div#slider svg").toggleClass("disabled");
+			if(d3.select(this.parentNode.parentNode).classed("active")) {
+				updateDataAllSeasons();
+			} else {
+				updateData(parseInt($(".parameter-value text").text()));
+			}
+		});
 }
 
 //////////////////////////////////////////////////////

@@ -59,9 +59,31 @@ svg {
 	fill: #fff;
 }
 
+#all-seasons-button svg rect {
+	-webkit-transition: fill 1s;
+	transition: fill 1s;
+	fill: #fff;
+}
+
+#all-seasons-button svg.active rect {
+	-webkit-transition: fill 1s;
+	transition: fill 1s;
+	fill: #d3d3d3;
+}
+
+#slider svg.disabled {
+	pointer-events: none;
+}
+
 #slider .parameter-value text {
 	font-size: 14px;
 	-webkit-transition: fill 1s;
 	transition: fill 1s;
 	fill: #fff;
+}
+
+#slider svg.disabled .parameter-value text {
+	-webkit-transition: fill 1s;
+	transition: fill 1s;
+	fill: #aaa;
 }
