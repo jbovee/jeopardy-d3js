@@ -2,10 +2,12 @@
 $(function() {
 	var initSeason = 1
 	seasonSlider();
+	allSeasons();
 	ddHeatmap(initSeason);
 	ddStats(initSeason);
 	fjStats(initSeason);
 	ddOrder(initSeason);
+	//allSeasonsData();
 	//createGraph();
 });
 
