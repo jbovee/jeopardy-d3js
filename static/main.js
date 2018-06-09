@@ -7,7 +7,7 @@ $(function() {
 	ddStats(initSeason);
 	fjStats(initSeason);
 	ddOrder(initSeason);
-	//allSeasonsData();
+	allSeasonsData();
 	//createGraph();
 });
 
@@ -474,10 +474,25 @@ function updateDataAllSeasons() {
 		});
 }
 
-/*
 //Function for calculating heatmap values for all seasons together.
 function allSeasonsData() {
 	var locationTotals = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		jLocationTotals = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		djLocationTotals = [
 		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0],
@@ -500,6 +515,46 @@ function allSeasonsData() {
 
 	var jOrder = (new Array(30)).init(0),
 		djOrder = (new Array(30)).init(0);
+
+	var locationTotalsAll = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		jLocationTotalsAll = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		djLocationTotalsAll = [
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
+	],
+		colTotalsAll = [0, 0, 0, 0, 0, 0],
+		rowTotalsAll = [0, 0, 0, 0, 0];
+
+	var ddMaxAll = 0,
+		ddMinAll = Infinity,
+		ddSumAll = 0,
+		ddAvgAll = [];
+
+	var fjMaxAll = 0,
+		fjMinAll = Infinity,
+		fjSumAll = 0,
+		fjAvgAll = [];
+
+	var jOrderAll = (new Array(30)).init(0),
+		djOrderAll = (new Array(30)).init(0);
 
 	d3.queue()
 		.defer(d3.json, "/season?no=1")
@@ -535,68 +590,151 @@ function allSeasonsData() {
 		.defer(d3.json, "/season?no=31")
 		.defer(d3.json, "/season?no=32")
 		.defer(d3.json, "/season?no=33")
-		.await(function(error, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33) {
+		.defer(d3.json, "/season?no=34")
+		.await(function(error, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33, s34) {
 			if (error) {
 				console.error("Something went wrong: " + error);
 			} else {
-				files = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33];
-				files.forEach(function(data) {
+				files = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19, s20, s21, s22, s23, s24, s25, s26, s27, s28, s29, s30, s31, s32, s33, s34];
+				files.forEach(function(data,i) {
+					locationTotals = [
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0]
+					],
+						jLocationTotals = [
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0]
+					],
+						djLocationTotals = [
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0],
+						[0, 0, 0, 0, 0]
+					],
+					colTotals = [0, 0, 0, 0, 0, 0],
+					rowTotals = [0, 0, 0, 0, 0];
+
+					ddMax = 0,
+					ddMin = Infinity,
+					ddSum = 0,
+					ddAvg = [];
+
+					fjMax = 0,
+					fjMin = Infinity,
+					fjSum = 0,
+					fjAvg = [];
+
+					jOrder = (new Array(30)).init(0),
+					djOrder = (new Array(30)).init(0);
+				
 					data.forEach(function(d) {
 						if (d.daily_double) {
 							locationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+							locationTotalsAll[d.coord[0]-1][d.coord[1]-1] += 1;
 							colTotals[d.coord[0]-1] += 1;
+							colTotalsAll[d.coord[0]-1] += 1;
 							rowTotals[d.coord[1]-1] += 1;
+							rowTotalsAll[d.coord[1]-1] += 1;
 
 							d.value = d.value[0];
 							if (d.value > ddMax) {
 								ddMax = d.value;
+								ddMaxAll = d.value;
 							}
 							if (d.value < ddMin) {
 								ddMin = d.value;
+								ddMinAll = d.value;
 							}
 							ddAvg.push(d.value);
+							ddAvgAll.push(d.value);
 							ddSum += d.value;
+							ddSumAll += d.value;
 
 							if (d.round_name == "Jeopardy") {
 								jOrder[d.order -1] += 1;
+								jOrderAll[d.order -1] += 1;
+								jLocationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+								jLocationTotalsAll[d.coord[0]-1][d.coord[1]-1] += 1;
 							}
 							if (d.round_name == "Double Jeopardy") {
 								djOrder[d.order -1] += 1;
+								djOrderAll[d.order -1] += 1;
+								djLocationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
+								djLocationTotalsAll[d.coord[0]-1][d.coord[1]-1] += 1;
 							}
 						}
 						if (d.round_name == "Final Jeopardy") {
 							d.value.forEach(function(v) {
 								if (v > fjMax) {
 									fjMax = v;
+									fjMaxAll = v;
 								}
 								if (v < fjMin) {
 									fjMin = v;
+									fjMinAll = v;
 								}
 								fjAvg.push(v);
+								fjAvgAll.push(v);
 								fjSum += v;
+								fjSumAll += v;
 							});
 						}
 					});
+					console.log('{');
+					console.log('"season": ' + (i + 1) + ',');
+					console.log('"locationTotals": [[' + locationTotals[0].toString() + "],[" + locationTotals[1].toString() + "],[" + locationTotals[2].toString() + "],[" + locationTotals[3].toString() + "],[" + locationTotals[4].toString() + "],[" + locationTotals[5].toString() + "]],");
+					console.log('"jLocationTotals": [[' + jLocationTotals[0].toString() + "],[" + jLocationTotals[1].toString() + "],[" + jLocationTotals[2].toString() + "],[" + jLocationTotals[3].toString() + "],[" + jLocationTotals[4].toString() + "],[" + jLocationTotals[5].toString() + "]],");
+					console.log('"djLocationTotals": [[' + djLocationTotals[0].toString() + "],[" + djLocationTotals[1].toString() + "],[" + djLocationTotals[2].toString() + "],[" + djLocationTotals[3].toString() + "],[" + djLocationTotals[4].toString() + "],[" + djLocationTotals[5].toString() + "]],");
+					console.log('"reduced": [' + locationTotals.toString() + '],');
+					console.log('"jReduced": [' + jLocationTotals.toString() + '],');
+					console.log('"djReduced": [' + djLocationTotals.toString() + '],');
+					console.log('"colTotals": [' + colTotals.toString() + '],');
+					console.log('"rowTotals": [' + rowTotals.toString() + '],');
+					console.log('"ddMax": ' + ddMax + ',');
+					console.log('"ddMin": ' + ddMin + ',');
+					console.log('"ddAvg": ' + (ddSum/ddAvg.length).toFixed(2) + ',');
+					console.log('"fjMax": ' + fjMax + ',');
+					console.log('"fjMin": ' + fjMin + ',');
+					console.log('"fjAvg": ' + (fjSum/fjAvg.length).toFixed(2) + ',');
+					console.log('"jOrder": [' + jOrder.toString() + '],');
+					console.log('"djOrder": [' + djOrder.toString() + ']');
+					console.log('},');
 				});
+				console.log('\nAll seasons')
+				console.log('{');
+				console.log('"locationTotals": [[' + locationTotalsAll[0].toString() + "],[" + locationTotalsAll[1].toString() + "],[" + locationTotalsAll[2].toString() + "],[" + locationTotalsAll[3].toString() + "],[" + locationTotalsAll[4].toString() + "],[" + locationTotalsAll[5].toString() + "]],");
+				console.log('"jLocationTotals": [[' + jLocationTotalsAll[0].toString() + "],[" + jLocationTotalsAll[1].toString() + "],[" + jLocationTotalsAll[2].toString() + "],[" + jLocationTotalsAll[3].toString() + "],[" + jLocationTotalsAll[4].toString() + "],[" + jLocationTotalsAll[5].toString() + "]],");
+				console.log('"djLocationTotals": [[' + djLocationTotalsAll[0].toString() + "],[" + djLocationTotalsAll[1].toString() + "],[" + djLocationTotalsAll[2].toString() + "],[" + djLocationTotalsAll[3].toString() + "],[" + djLocationTotalsAll[4].toString() + "],[" + djLocationTotals[5].toString() + "]],");
+				console.log('"reduced": [' + locationTotalsAll.toString() + '],');
+				console.log('"jReduced": [' + jLocationTotalsAll.toString() + '],');
+				console.log('"djReduced": [' + djLocationTotalsAll.toString() + '],');
+				console.log('"colTotals": [' + colTotalsAll.toString() + '],');
+				console.log('"rowTotals": [' + rowTotalsAll.toString() + '],');
+				console.log('"ddMax": ' + ddMaxAll + ',');
+				console.log('"ddMin": ' + ddMinAll + ',');
+				console.log('"ddAvg": ' + (ddSumAll/ddAvgAll.length).toFixed(2) + ',');
+				console.log('"fjMax": ' + fjMaxAll + ',');
+				console.log('"fjMin": ' + fjMinAll + ',');
+				console.log('"fjAvg": ' + (fjSumAll/fjAvgAll.length).toFixed(2) + ',');
+				console.log('"jOrder": [' + jOrderAll.toString() + '],');
+				console.log('"djOrder": [' + djOrderAll.toString() + ']');
+				console.log('}');
 			}
-			console.log(locationTotals);
-			console.log(colTotals);
-			console.log(rowTotals);
-
-			console.log("DDMax: " + ddMax);
-			console.log("DDMin: " + ddMin);
-			console.log("DDAvg: " + (ddSum/ddAvg.length).toFixed(2))
-			console.log("FJMax: " + fjMax);
-			console.log("FJMin: " + fjMin);
-			console.log("FJAvg: " + (fjSum/fjAvg.length).toFixed(2))
-			console.log(jOrder);
-			console.log(djOrder);
 		});
 }
-*/
 
 function seasonSlider() {
-	var numSeasons = 33,
+	var numSeasons = 34,
 		seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
 
 	var slider2 = d3.sliderHorizontal()
@@ -683,7 +821,7 @@ function ddHeatmap(seasonNo) {
 	startColor = "#FFFFFF";
 	endColor = "#0000FF";
 
-	var numSeasons = 33;
+	var numSeasons = 34;
 	var seasons = Array.from(new Array(numSeasons), (val,index)=>index+1);
 
 	var locationTotals = [
