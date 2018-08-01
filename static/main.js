@@ -501,7 +501,11 @@ function allSeasonsData() {
 		[0, 0, 0, 0, 0]
 	],
 		colTotals = [0, 0, 0, 0, 0, 0],
-		rowTotals = [0, 0, 0, 0, 0];
+		rowTotals = [0, 0, 0, 0, 0],
+		jColTotals = [0, 0, 0, 0, 0, 0],
+		jRowTotals = [0, 0, 0, 0, 0],
+		djColTotals = [0, 0, 0, 0, 0, 0],
+		djRowTotals = [0, 0, 0, 0, 0];
 
 	var ddMax = 0,
 		ddMin = Infinity,
@@ -541,7 +545,11 @@ function allSeasonsData() {
 		[0, 0, 0, 0, 0]
 	],
 		colTotalsAll = [0, 0, 0, 0, 0, 0],
-		rowTotalsAll = [0, 0, 0, 0, 0];
+		rowTotalsAll = [0, 0, 0, 0, 0],
+		jColTotalsAll = [0, 0, 0, 0, 0, 0],
+		jRowTotalsAll = [0, 0, 0, 0, 0],
+		djColTotalsAll = [0, 0, 0, 0, 0, 0],
+		djRowTotalsAll = [0, 0, 0, 0, 0];
 
 	var ddMaxAll = 0,
 		ddMinAll = Infinity,
@@ -622,7 +630,11 @@ function allSeasonsData() {
 						[0, 0, 0, 0, 0]
 					],
 					colTotals = [0, 0, 0, 0, 0, 0],
-					rowTotals = [0, 0, 0, 0, 0];
+					rowTotals = [0, 0, 0, 0, 0],
+					jColTotals = [0, 0, 0, 0, 0, 0],
+					jRowTotals = [0, 0, 0, 0, 0],
+					djColTotals = [0, 0, 0, 0, 0, 0],
+					djRowTotals = [0, 0, 0, 0, 0];
 
 					ddMax = 0,
 					ddMin = Infinity,
@@ -663,12 +675,20 @@ function allSeasonsData() {
 							if (d.round_name == "Jeopardy") {
 								jOrder[d.order -1] += 1;
 								jOrderAll[d.order -1] += 1;
+								jColTotals[d.coord[0]-1] += 1;
+								jColTotalsAll[d.coord[0]-1] += 1;
+								jRowTotals[d.coord[1]-1] += 1;
+								jRowTotalsAll[d.coord[1]-1] += 1;
 								jLocationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
 								jLocationTotalsAll[d.coord[0]-1][d.coord[1]-1] += 1;
 							}
 							if (d.round_name == "Double Jeopardy") {
 								djOrder[d.order -1] += 1;
 								djOrderAll[d.order -1] += 1;
+								djColTotals[d.coord[0]-1] += 1;
+								djColTotalsAll[d.coord[0]-1] += 1;
+								djRowTotals[d.coord[1]-1] += 1;
+								djRowTotalsAll[d.coord[1]-1] += 1;
 								djLocationTotals[d.coord[0]-1][d.coord[1]-1] += 1;
 								djLocationTotalsAll[d.coord[0]-1][d.coord[1]-1] += 1;
 							}
@@ -700,6 +720,10 @@ function allSeasonsData() {
 					console.log('"djReduced": [' + djLocationTotals.toString() + '],');
 					console.log('"colTotals": [' + colTotals.toString() + '],');
 					console.log('"rowTotals": [' + rowTotals.toString() + '],');
+					console.log('"jColTotals": [' + jColTotals.toString() + '],');
+					console.log('"jRowTotals": [' + jRowTotals.toString() + '],');
+					console.log('"djColTotals": [' + djColTotals.toString() + '],');
+					console.log('"djRowTotals": [' + djRowTotals.toString() + '],');
 					console.log('"ddMax": ' + ddMax + ',');
 					console.log('"ddMin": ' + ddMin + ',');
 					console.log('"ddAvg": ' + (ddSum/ddAvg.length).toFixed(2) + ',');
@@ -720,6 +744,10 @@ function allSeasonsData() {
 				console.log('"djReduced": [' + djLocationTotalsAll.toString() + '],');
 				console.log('"colTotals": [' + colTotalsAll.toString() + '],');
 				console.log('"rowTotals": [' + rowTotalsAll.toString() + '],');
+				console.log('"jColTotals": [' + jColTotalsAll.toString() + '],');
+				console.log('"jRowTotals": [' + jRowTotalsAll.toString() + '],');
+				console.log('"djColTotals": [' + djColTotalsAll.toString() + '],');
+				console.log('"djRowTotals": [' + djRowTotalsAll.toString() + '],');
 				console.log('"ddMax": ' + ddMaxAll + ',');
 				console.log('"ddMin": ' + ddMinAll + ',');
 				console.log('"ddAvg": ' + (ddSumAll/ddAvgAll.length).toFixed(2) + ',');
