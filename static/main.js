@@ -738,7 +738,7 @@ function allSeasonsData() {
 				console.log('{');
 				console.log('"locationTotals": [[' + locationTotalsAll[0].toString() + "],[" + locationTotalsAll[1].toString() + "],[" + locationTotalsAll[2].toString() + "],[" + locationTotalsAll[3].toString() + "],[" + locationTotalsAll[4].toString() + "],[" + locationTotalsAll[5].toString() + "]],");
 				console.log('"jLocationTotals": [[' + jLocationTotalsAll[0].toString() + "],[" + jLocationTotalsAll[1].toString() + "],[" + jLocationTotalsAll[2].toString() + "],[" + jLocationTotalsAll[3].toString() + "],[" + jLocationTotalsAll[4].toString() + "],[" + jLocationTotalsAll[5].toString() + "]],");
-				console.log('"djLocationTotals": [[' + djLocationTotalsAll[0].toString() + "],[" + djLocationTotalsAll[1].toString() + "],[" + djLocationTotalsAll[2].toString() + "],[" + djLocationTotalsAll[3].toString() + "],[" + djLocationTotalsAll[4].toString() + "],[" + djLocationTotals[5].toString() + "]],");
+				console.log('"djLocationTotals": [[' + djLocationTotalsAll[0].toString() + "],[" + djLocationTotalsAll[1].toString() + "],[" + djLocationTotalsAll[2].toString() + "],[" + djLocationTotalsAll[3].toString() + "],[" + djLocationTotalsAll[4].toString() + "],[" + djLocationTotalsAll[5].toString() + "]],");
 				console.log('"reduced": [' + locationTotalsAll.toString() + '],');
 				console.log('"jReduced": [' + jLocationTotalsAll.toString() + '],');
 				console.log('"djReduced": [' + djLocationTotalsAll.toString() + '],');
